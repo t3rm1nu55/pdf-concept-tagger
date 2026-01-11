@@ -1,118 +1,87 @@
-# Full Demo Machine Backend
+# Backend Python - PDF Concept Tagger MVP
 
-Production-like backend with LangChain/LangGraph, proper databases, and RAG pipeline.
-
-## Status
-
-🚧 **In Development** - Follow TASKS.md for implementation
+> **FastAPI backend with Cognizant LLM Gateway integration**
 
 ## Quick Start
 
-### Setup Virtual Environment
-
-**Option 1: Use setup script (Recommended)**
 ```bash
-cd backend-python
-chmod +x setup.sh
-./setup.sh
-source venv/bin/activate
-```
+# 1. Start gateway (separate terminal)
+cd /Users/markforster/cognizant-llm-gateway
+python -m clg.server
 
-**Option 2: Manual setup**
-```bash
+# 2. Setup backend
 cd backend-python
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
-```
+source venv/bin/activate
+pip install -r requirements-mvp.txt
 
-### Configure Environment
-
-1. Copy `.env.example` to `.env`:
-```bash
+# 3. Configure
 cp .env.example .env
-```
+# Edit .env: set COGNIZANT_LLM_GATEWAY_URL=http://localhost:8080
 
-2. Edit `.env` and add your API keys:
-```bash
-nano .env  # or use your preferred editor
-```
+# 4. Start database
+docker-compose -f docker-compose.mvp.yml up -d
 
-### Run Examples
+# 5. Run migrations
+alembic upgrade head
 
-```bash
-# Activate venv (if not already active)
-source venv/bin/activate
-
-# Run LlamaIndex examples
-python llamaindex_example_usage.py
-
-# Test structured extraction pipeline
-python -c "from structured_extraction_pipeline import StructuredExtractionPipeline; print('Pipeline ready!')"
-```
-
-### Development
-
-```bash
-# Activate venv
-source venv/bin/activate
-
-# Install new packages
-pip install package_name
-pip freeze > requirements.txt  # Update requirements
-
-# Run tests (when available)
-pytest
-
-# Start server (when implemented)
+# 6. Start server
 uvicorn app.main:app --reload
 ```
 
-### Virtual Environment Management
+See [docs/GETTING_STARTED.md](../docs/GETTING_STARTED.md) for detailed instructions.
 
-**Activate:**
-```bash
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+## Documentation
+
+- **[Getting Started](../docs/GETTING_STARTED.md)** - Quick start guide
+- **[Setup Guide](../docs/SETUP.md)** - Complete setup instructions
+- **[MVP Status](../docs/MVP_STATUS.md)** - Current status and features
+- **[Gateway Setup](GATEWAY_SETUP.md)** - Cognizant LLM Gateway configuration
+- **[Testing Guide](TESTING.md)** - Testing instructions
+
+## Project Structure
+
+```
+backend-python/
+├── app/
+│   ├── api/v1/endpoints/    # API endpoints
+│   ├── services/            # Business logic
+│   ├── models/              # Database models
+│   ├── database/            # Database connection
+│   └── core/                # Core utilities (logging, etc.)
+├── alembic/                 # Database migrations
+├── tests/                   # Test suite
+├── scripts/                 # Utility scripts
+└── requirements-mvp.txt    # MVP dependencies
 ```
 
-**Deactivate:**
+## API Endpoints
+
+- `POST /api/v1/analyze` - Upload PDF and extract concepts
+- `GET /api/v1/concepts` - List concepts
+- `GET /api/v1/graph` - Get graph data
+- `WS /api/v1/ws/{document_id}` - Real-time updates
+
+See [docs/MVP_STATUS.md](../docs/MVP_STATUS.md) for full API documentation.
+
+## Development
+
+### Run Tests
 ```bash
-deactivate
+pytest tests/ -v
 ```
 
-**Check if activated:**
+### Code Quality
 ```bash
-which python  # Should show venv/bin/python
+ruff check app/
+black app/
+mypy app/
 ```
 
-**Remove and recreate:**
-```bash
-rm -rf venv
-./setup.sh
-```
+See [PROJECT_RULES.md](../PROJECT_RULES.md) for development standards.
 
-## Architecture
+## Status
 
-See DEMO_ARCHITECTURE.md for full architecture details.
+✅ **MVP Complete** - Core features working, ready for frontend integration
 
-## Development Tasks
-
-Follow TASKS.md for detailed task breakdown.
-
-## Development Guidelines
-
-**Follow [PROJECT_RULES.md](../PROJECT_RULES.md) for:**
-- Incremental & modular development
-- Critical mocking guidelines (pytest-specific)
-- Requirements → Design → Tasks pipeline
-- State-based actions and transparency
-- Pragmatic decision-making
-
-## Parallel Development
-
-This track runs parallel to `experiment-backend/`:
-- Experiment backend validates approaches quickly
-- This backend implements properly with full architecture
-- Learnings flow from experiment → demo
+See [docs/MVP_STATUS.md](../docs/MVP_STATUS.md) for current status and next steps.

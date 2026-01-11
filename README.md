@@ -4,16 +4,14 @@ Intelligent PDF analysis system using multi-agent AI to extract concepts, relati
 
 ## 🚀 Quick Start
 
-**Want to experiment immediately?**
+**Get started in 5 minutes:**
 ```bash
-cd experiment-backend
-./setup.sh
-# Edit .env with API keys
-python server.py
+# See docs/GETTING_STARTED.md for complete instructions
+cd backend-python
+./start_services.sh
 ```
 
-**Want the full demo machine?**
-See [docs/demo-machine/DEMO_SETUP.md](docs/demo-machine/DEMO_SETUP.md) for complete setup instructions.
+**Full setup guide:** [docs/SETUP.md](docs/SETUP.md)
 
 ## 📋 Project Status
 
@@ -41,39 +39,32 @@ See [docs/demo-machine/DEMO_ARCHITECTURE.md](docs/demo-machine/DEMO_ARCHITECTURE
 
 ## 📚 Documentation
 
-### Production (Main Branch)
-- **[REQUIREMENTS.md](REQUIREMENTS.md)** - Functional requirements
-- **[CONTEXT.md](CONTEXT.md)** - Project context
-- **[PROJECT_RULES.md](PROJECT_RULES.md)** - Development rules and standards ⭐
+**📖 [Complete Documentation Index](docs/README.md)** - Single source of truth
 
-### Development (Develop Branch)
-- **[docs/development/PARALLEL_DEVELOPMENT.md](docs/development/PARALLEL_DEVELOPMENT.md)** - Development coordination
-- **[docs/development/REPO_STRUCTURE.md](docs/development/REPO_STRUCTURE.md)** - Repository structure
-- **[docs/development/BRANCH_STRATEGY.md](docs/development/BRANCH_STRATEGY.md)** - Git workflow
+### Essential Docs
+- **[Getting Started](docs/GETTING_STARTED.md)** - Quick start guide ⭐
+- **[Setup Guide](docs/SETUP.md)** - Complete setup instructions
+- **[MVP Status](docs/MVP_STATUS.md)** - Current status and features
+- **[Requirements](REQUIREMENTS.md)** - Functional requirements
+- **[Project Rules](PROJECT_RULES.md)** - Development standards ⭐
 
-### Track 1: Experimentation (track1-experiment Branch)
-- **[experiment-backend/README.md](experiment-backend/README.md)** - Experiment backend guide
-- **[experiment-backend/QUICK_START.md](experiment-backend/QUICK_START.md)** - Quick start
+### Development
+- **[Design](docs/demo-machine/DESIGN.md)** - Complete design specification
+- **[Architecture](docs/demo-machine/DEMO_ARCHITECTURE.md)** - System architecture
+- **[Tasks](docs/demo-machine/TASKS.md)** - Implementation tasks
+- **[Prototype Alignment](docs/PROTOTYPE_ALIGNMENT.md)** - Frontend integration guide
 
-### Track 2: Demo Machine (track2-demo-machine Branch)
-- **[docs/demo-machine/DEMO_ARCHITECTURE.md](docs/demo-machine/DEMO_ARCHITECTURE.md)** - Architecture design
-- **[docs/demo-machine/DEMO_SETUP.md](docs/demo-machine/DEMO_SETUP.md)** - Setup instructions
-- **[docs/demo-machine/TASKS.md](docs/demo-machine/TASKS.md)** - Task breakdown
-- **[docs/demo-machine/DESIGN_HOOKS.md](docs/demo-machine/DESIGN_HOOKS.md)** - Design hooks reference
+### Configuration
+- **[Gateway Setup](docs/backend-python/GATEWAY_SETUP.md)** - Cognizant LLM Gateway
+- **[Environment Config](docs/config/ENV_CONFIG.md)** - Environment variables
 
-## 🔄 Development Tracks
+## 📋 Current Status
 
-### Track 1: Experimentation (Fast)
-- Experiment with prompts, models, techniques
-- Quick iteration and validation
-- Immediate feedback
+**MVP Backend**: ✅ Complete and ready for testing  
+**Frontend**: ⏳ Needs API format alignment (see [Prototype Alignment](docs/PROTOTYPE_ALIGNMENT.md))  
+**Next Steps**: Align backend with prototype, connect frontend, expand features
 
-### Track 2: Demo Machine (Comprehensive)
-- Production-like architecture
-- Full feature implementation
-- Proper databases and agents
-
-Both tracks run in parallel and share learnings.
+See [MVP Status](docs/MVP_STATUS.md) for details.
 
 ## 🛠️ Technology Stack
 
@@ -97,19 +88,19 @@ Both tracks run in parallel and share learnings.
 
 **Before contributing, read [PROJECT_RULES.md](PROJECT_RULES.md) for development guidelines.**
 
-1. Check [docs/development/BRANCH_STRATEGY.md](docs/development/BRANCH_STRATEGY.md) for workflow
-2. Track 1: Use `track1-experiment` branch
-3. Track 2: Use `track2-demo-machine` branch
-4. See [docs/development/PARALLEL_DEVELOPMENT.md](docs/development/PARALLEL_DEVELOPMENT.md) for coordination
-5. Follow [PROJECT_RULES.md](PROJECT_RULES.md) for code quality standards
+1. Read [Getting Started](docs/GETTING_STARTED.md)
+2. Follow [Project Rules](PROJECT_RULES.md) for code quality
+3. See [MVP Status](docs/MVP_STATUS.md) for current status
+4. Check [Prototype Alignment](docs/PROTOTYPE_ALIGNMENT.md) for next steps
 
 ## 📝 License
 
 [Add your license here]
 
-## 🔗 Links
+## 🔗 Quick Links
 
-- Architecture: [DEMO_ARCHITECTURE.md](DEMO_ARCHITECTURE.md)
-- Requirements: [REQUIREMENTS.md](REQUIREMENTS.md)
-- Tasks: [TASKS.md](TASKS.md)
-- Quick Start: [START_HERE.md](START_HERE.md)
+- **[Documentation](docs/README.md)** - Complete documentation index
+- **[Getting Started](docs/GETTING_STARTED.md)** - Quick start guide
+- **[Requirements](REQUIREMENTS.md)** - Functional requirements
+- **[Design](docs/demo-machine/DESIGN.md)** - Design specification
+- **[Tasks](docs/demo-machine/TASKS.md)** - Implementation tasks
