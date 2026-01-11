@@ -1,4 +1,14 @@
-# Implementation Tasks
+# Demo Machine Implementation Tasks
+
+> **Status**: Ready for Implementation  
+> **Version**: 2.0.0  
+> **Date**: 2026-01-11  
+> **Design Reference**: [DESIGN.md](DESIGN.md)  
+> **Requirements Reference**: [REQUIREMENTS.md](../../REQUIREMENTS.md)
+
+## Overview
+
+This document provides detailed, actionable tasks for building the PDF Concept Tagger demo machine. Tasks are organized by phase, with clear dependencies, acceptance criteria, and implementation guidance.
 
 ## Task Dependency Legend
 - 🟢 **No Dependencies** - Can start immediately
@@ -6,28 +16,100 @@
 - 🔴 **Many Dependencies** - Depends on 3+ tasks
 - 🔵 **Separate Chain** - Independent parallel work
 
+## Task Format
+
+Each task includes:
+- **ID**: Unique task identifier
+- **Dependencies**: Tasks that must complete first
+- **Effort**: Estimated hours
+- **Acceptance Criteria**: Testable completion criteria
+- **Implementation Notes**: Key design decisions and guidance
+- **Design Reference**: Links to DESIGN.md sections
+
+---
+
 ## Phase 1: Foundation Setup (Week 1)
 
 ### Backend Foundation
 
 #### 🟢 T1.1: Set up Python Project Structure
-**Dependencies**: None
-**Effort**: 2 hours
+**Dependencies**: None  
+**Effort**: 2 hours  
+**Design Reference**: [DESIGN.md](DESIGN.md#api-design)
+
 **Tasks**:
-- Create `backend/` directory
-- Set up `requirements.txt` with FastAPI, LangChain, etc.
-- Create basic project structure
-- Set up `.env.example`
-- Initialize git (if separate repo)
+- Create `backend-python/` directory structure:
+  ```
+  backend-python/
+  ├── app/
+  │   ├── api/v1/endpoints/
+  │   ├── agents/
+  │   ├── services/
+  │   ├── models/
+  │   └── main.py
+  ├── prompts/
+  ├── domain_models/
+  ├── tests/
+  ├── requirements.txt
+  ├── .env.example
+  └── pyproject.toml
+  ```
+- Set up `requirements.txt` with core dependencies:
+  - FastAPI, uvicorn, pydantic
+  - LangChain, LangGraph
+  - PostgreSQL (psycopg2), Neo4j (neo4j), Pinecone (pinecone-client)
+  - Redis (redis), Elasticsearch (elasticsearch)
+  - PDF processing (docling or pdfplumber)
+- Create `.env.example` with all required environment variables
+- Set up `pyproject.toml` for tooling (ruff, black, mypy, pytest)
+
+**Acceptance Criteria**:
+- [ ] Project structure matches DESIGN.md specification
+- [ ] All dependencies install without errors (`pip install -r requirements.txt`)
+- [ ] `.env.example` includes all required variables with descriptions
+- [ ] Code quality tools configured (ruff, black, mypy)
+- [ ] Basic FastAPI app runs (`uvicorn app.main:app --reload`)
+
+**Implementation Notes**:
+- Follow PROJECT_RULES.md for incremental development
+- Use Python 3.11+ for best async support
+- Reference DEMO_ARCHITECTURE.md for structure guidance
 
 #### 🟢 T1.2: Set up PostgreSQL Database
-**Dependencies**: None
-**Effort**: 1 hour
+**Dependencies**: None  
+**Effort**: 1 hour  
+**Design Reference**: [DESIGN.md](DESIGN.md#data-model-design) - PostgreSQL Schema
+
 **Tasks**:
-- Install PostgreSQL (local or set up managed)
-- Create database schema (concepts, documents, relationships)
-- Set up Alembic for migrations
-- Create connection module
+- Install PostgreSQL (local via Docker or managed service)
+- Create database `pdf_tagger`
+- Set up Alembic for migrations:
+  ```bash
+  alembic init alembic
+  alembic revision --autogenerate -m "Initial schema"
+  ```
+- Create initial schema (see DESIGN.md Section 2.1):
+  - `documents` table
+  - `concepts` table
+  - `relationships` table
+  - `domain_models` table
+  - `hooks` table
+  - `questions` table
+- Create connection module: `app/database/postgres.py`
+- Add indexes as specified in DESIGN.md
+
+**Acceptance Criteria**:
+- [ ] Database connection successful (`python scripts/test_connections.py`)
+- [ ] All tables created with correct schema
+- [ ] Indexes created for performance
+- [ ] Alembic migrations work (`alembic upgrade head`)
+- [ ] Connection module handles errors gracefully
+
+**Implementation Notes**:
+- Use asyncpg for async PostgreSQL operations
+- Follow DESIGN.md schema exactly
+- Add proper indexes for query performance
+- Use connection pooling for scalability
 
 #### 🟢 T1.3: Set up Neo4j Database
 **Dependencies**: None
@@ -48,14 +130,45 @@
 - Test vector operations
 
 #### 🟡 T1.5: Set up FastAPI Application
-**Dependencies**: T1.1
-**Effort**: 3 hours
+**Dependencies**: T1.1  
+**Effort**: 3 hours  
+**Design Reference**: [DESIGN.md](DESIGN.md#api-design) - REST API Endpoints
+
 **Tasks**:
-- Create FastAPI app structure
-- Set up CORS and middleware
-- Create basic health check endpoint
-- Set up error handling
-- Configure logging
+- Create FastAPI app in `app/main.py`:
+  ```python
+  from fastapi import FastAPI
+  from fastapi.middleware.cors import CORSMiddleware
+  
+  app = FastAPI(title="PDF Concept Tagger API", version="1.0.0")
+  
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=["http://localhost:5173"],  # Vite dev server
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+  ```
+- Set up error handling middleware (see DESIGN.md Error Handling)
+- Create health check endpoint: `GET /health`
+- Configure structured logging (JSON format)
+- Set up API router structure: `app/api/v1/router.py`
+- Add request/response models using Pydantic
+
+**Acceptance Criteria**:
+- [ ] FastAPI app starts without errors
+- [ ] CORS configured for frontend
+- [ ] Health check endpoint returns 200 OK
+- [ ] Error handling returns consistent format (see DESIGN.md)
+- [ ] Logging outputs structured JSON
+- [ ] API documentation available at `/docs`
+
+**Implementation Notes**:
+- Use Pydantic models for request/response validation
+- Follow DESIGN.md error response format
+- Set up logging early for debugging
+- Enable OpenAPI docs for API exploration
 
 #### 🟡 T1.6: Set up Redis
 **Dependencies**: None
