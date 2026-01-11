@@ -13,7 +13,7 @@ python server.py
 ```
 
 **Want the full demo machine?**
-See [START_HERE.md](START_HERE.md) for complete setup instructions.
+See [docs/demo-machine/DEMO_SETUP.md](docs/demo-machine/DEMO_SETUP.md) for complete setup instructions.
 
 ## 📋 Project Status
 
@@ -27,7 +27,7 @@ See [START_HERE.md](START_HERE.md) for complete setup instructions.
 - **Status**: In development
 - **Location**: `backend-python/`
 - **Purpose**: Production-like system with proper architecture
-- **Timeline**: 9 weeks (see TASKS.md)
+- **Timeline**: 9 weeks (see [docs/demo-machine/TASKS.md](docs/demo-machine/TASKS.md))
 
 ## 🏗️ Architecture
 
@@ -37,7 +37,7 @@ See [START_HERE.md](START_HERE.md) for complete setup instructions.
 - **Frontend**: React + Vite (Track 2) / Angular (legacy)
 - **LLM**: OpenAI, Anthropic, Google Gemini
 
-See [DEMO_ARCHITECTURE.md](DEMO_ARCHITECTURE.md) for full details.
+See [docs/demo-machine/DEMO_ARCHITECTURE.md](docs/demo-machine/DEMO_ARCHITECTURE.md) for full details.
 
 ## 📚 Documentation
 

@@ -20,9 +20,8 @@ This document provides a complete index of all documentation organized by branch
 - `BRANCH_STRATEGY.md` - Git workflow
 - `README.md` - Development docs index
 
-**Location**: Root directory
+**Location**: `docs/development/`
 - `START_HERE.md` - Entry point for developers
-- `QUICK_START.md` - Quick reference (if exists)
 
 ## Branch: `track1-experiment` (Experimentation)
 
