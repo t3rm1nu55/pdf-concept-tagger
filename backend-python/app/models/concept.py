@@ -58,5 +58,5 @@ class Relationship(Base):
     predicate = Column(String(200))
     confidence = Column(Float)
     strength = Column(Float)
-    metadata = Column(JSON)
+    relationship_metadata = Column(JSON)  # Renamed from 'metadata' (reserved in SQLAlchemy)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

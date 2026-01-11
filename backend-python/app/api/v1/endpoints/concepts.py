@@ -95,7 +95,7 @@ async def get_concept(
         "source_location": concept.source_location,
         "ui_group": concept.ui_group,
         "extracted_by": concept.extracted_by,
-        "metadata": concept.metadata,
+        "metadata": concept.concept_metadata,
         "document_id": str(concept.document_id),
         "created_at": concept.created_at.isoformat() if concept.created_at else None,
         "updated_at": concept.updated_at.isoformat() if concept.updated_at else None
