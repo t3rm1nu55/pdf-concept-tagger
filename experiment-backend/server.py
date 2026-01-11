@@ -398,14 +398,32 @@ async def get_models():
 
 @app.post("/api/v1/models/switch")
 async def switch_model(provider: str, model: Optional[str] = None):
-    """Switch LLM provider/model"""
+    """
+    Switch LLM provider/model at runtime.
+    
+    Args:
+        provider: LLM provider ("openai", "anthropic", "google")
+        model: Optional model name override
+        
+    Returns:
+        Dict with status, provider, and model
+        
+    Raises:
+        HTTPException: If provider is invalid
+        
+    Note:
+        This changes global state. In production, consider per-request configuration.
+    """
+    if provider not in ["openai", "anthropic", "google"]:
+        raise HTTPException(status_code=400, detail=f"Invalid provider: {provider}. Use: openai, anthropic, google")
+    
     global LLM_PROVIDER
-    if provider in ["openai", "anthropic", "google"]:
-        LLM_PROVIDER = provider
-        if model:
-            os.environ[f"{provider.upper()}_MODEL"] = model
-        return {"status": "switched", "provider": LLM_PROVIDER, "model": model}
-    return {"error": "Invalid provider"}
+    LLM_PROVIDER = provider
+    
+    if model:
+        os.environ[f"{provider.upper()}_MODEL"] = model
+    
+    return {"status": "switched", "provider": LLM_PROVIDER, "model": model}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
