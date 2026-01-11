@@ -11,63 +11,62 @@
 - ✅ Comprehensive test suite
 - ✅ Documentation and setup scripts
 
-**What's Missing:**
-- ⏳ Frontend (UI for interacting with the system)
-- ⏳ End-to-end testing with real PDFs
-- ⏳ Multi-agent workflow (ARCHITECT, CURATOR, etc.)
-- ⏳ Advanced features (Neo4j, RAG, domain models)
+**What's Missing (vs Prototype):**
+- ⏳ **AgentPacket protocol format** (prototype expects specific structure)
+- ⏳ **ARCHITECT agent** (domains)
+- ⏳ **CURATOR agent** (taxonomies)
+- ⏳ **CRITIC agent** (hypotheses)
+- ⏳ **Missing data models** (Domain, Taxonomy, Hypothesis, Prior)
+- ⏳ **Frontend integration** (Angular frontend exists but needs API format match)
+
+**See**: `PROTOTYPE_ALIGNMENT.md` for detailed gap analysis
 
 ---
 
 ## 🎯 Immediate Next Steps (Choose Your Path)
 
-### Option 1: Test & Validate MVP Backend ⭐ Recommended First
+### Option 1: Align Backend with Prototype ⭐ **CRITICAL - Do First**
 
-**Goal**: Verify the backend works end-to-end before building frontend
+**Goal**: Make existing Angular frontend work with FastAPI backend
+
+**Problem**: Prototype expects AgentPacket format, but MVP returns different format
 
 **Steps:**
-1. **Start Services**
-   ```bash
-   # Terminal 1: Start Gateway
-   cd /Users/markforster/cognizant-llm-gateway
-   python -m clg.server
-   
-   # Terminal 2: Start Backend
-   cd backend-python
-   ./start_services.sh
-   ```
+1. **Fix API Response Format** (2-4 hours)
+   - Update `/api/v1/analyze` to return AgentPacket format
+   - Match prototype's expected structure:
+     ```json
+     {
+       "sender": "HARVESTER",
+       "intent": "GRAPH_UPDATE",
+       "content": {
+         "concept": { "id", "term", "type", "ui_group", ... }
+       }
+     }
+     ```
 
-2. **Test API Endpoints**
-   ```bash
-   # Health check
-   curl http://localhost:8000/health
-   
-   # Upload PDF (requires a test PDF)
-   curl -X POST http://localhost:8000/api/v1/analyze \
-     -F "file=@test.pdf" \
-     -F "page_number=1"
-   
-   # Query concepts
-   curl http://localhost:8000/api/v1/concepts
-   
-   # Get graph data
-   curl http://localhost:8000/api/v1/graph
-   ```
+2. **Add Missing Data Models** (2-3 hours)
+   - Create Domain, Taxonomy, Hypothesis, Prior models
+   - Add database migrations
+   - See `PROTOTYPE_ALIGNMENT.md` for details
 
-3. **Verify Concept Extraction**
-   - Upload a real PDF document
-   - Check that concepts are extracted correctly
-   - Verify they're stored in PostgreSQL
-   - Test WebSocket real-time updates
+3. **Update WebSocket Format** (1-2 hours)
+   - Send AgentPacket format via WebSocket
+   - Match prototype's streaming expectations
 
-4. **Fix Any Issues**
-   - Debug gateway connection problems
-   - Fix concept extraction quality
-   - Improve error handling
-   - Optimize performance
+4. **Add Basic Agent Stubs** (3-4 hours)
+   - Create ARCHITECT, CURATOR, CRITIC agents (minimal)
+   - Return appropriate AgentPackets (can be empty for now)
 
-**Time**: 2-4 hours  
-**Outcome**: Confident backend is working, ready for frontend
+5. **Test Frontend Connection** (1-2 hours)
+   - Connect Angular frontend to FastAPI backend
+   - Verify graph visualization works
+   - Test real-time updates
+
+**Time**: 1 day  
+**Outcome**: Working frontend connected to backend
+
+**See**: `PROTOTYPE_ALIGNMENT.md` for detailed gap analysis
 
 ---
 
@@ -77,19 +76,22 @@
 
 **You Have Two Choices:**
 
-#### A. Port Existing Angular Frontend (Faster)
+#### A. Port Existing Angular Frontend (Faster) ⚠️ **Requires Backend Alignment First**
 - **Location**: `src/` directory (Angular 20+)
 - **Status**: Already has D3.js graph, PDF viewer, concept display
 - **Task**: Connect it to new FastAPI backend instead of Gemini API
-- **Time**: 4-8 hours
+- **Time**: 4-8 hours (after backend alignment)
 - **Pros**: UI already exists, just needs API integration
 - **Cons**: Angular (vs React in design)
 
+**Prerequisites**: Complete Option 1 first (align backend with prototype)
+
 **Steps:**
-1. Update Angular services to call FastAPI endpoints
-2. Replace Gemini API calls with backend API calls
-3. Update WebSocket connection to backend
+1. ✅ Backend returns AgentPacket format (from Option 1)
+2. Update Angular `BackendApiService` to call FastAPI endpoints
+3. Update WebSocket URL to `ws://localhost:8000/api/v1/ws/{document_id}`
 4. Test end-to-end workflow
+5. Verify graph visualization works
 
 #### B. Build New React Frontend (Better Long-term)
 - **Design**: React + Vite + Tailwind + D3.js (per DESIGN.md)
@@ -152,25 +154,32 @@
 
 ## 📋 Recommended Development Order
 
-### Phase 1: Validate MVP (This Week)
-1. ✅ Backend complete
-2. ⏳ Test end-to-end with real PDFs
-3. ⏳ Fix any bugs or issues
-4. ⏳ Document findings
+### Phase 1: Align Backend with Prototype (This Week) ⭐ **CRITICAL**
+1. ✅ Backend complete (basic structure)
+2. ⏳ **Fix API format to match AgentPacket protocol** (2-4 hours)
+3. ⏳ **Add missing data models** (Domain, Taxonomy, Hypothesis, Prior) (2-3 hours)
+4. ⏳ **Update WebSocket format** (1-2 hours)
+5. ⏳ **Add basic agent stubs** (ARCHITECT, CURATOR, CRITIC) (3-4 hours)
+6. ⏳ **Test with Angular frontend** (1-2 hours)
 
-### Phase 2: Frontend (Next Week)
-1. Port Angular frontend to use FastAPI backend
-2. Test full workflow (upload → extract → visualize)
-3. Get user feedback
-4. Iterate on UX
+**Outcome**: Working frontend connected to backend
+
+### Phase 2: Implement Real Agents (Next Week)
+1. Implement ARCHITECT agent (domain detection)
+2. Implement CURATOR agent (taxonomy building)
+3. Add bounding box extraction
+4. Improve UI group assignment
+5. Test full workflow (upload → extract → visualize)
+
+**Outcome**: Feature parity with prototype
 
 ### Phase 3: Expand Features (Weeks 3-9)
-1. Add ARCHITECT agent
-2. Add CURATOR agent
+1. Implement CRITIC agent (hypotheses)
+2. Implement OBSERVER agent
 3. Integrate Neo4j
 4. Add RAG pipeline
 5. Add domain model matching
-6. Add advanced features (hooks, hypotheses, etc.)
+6. Add advanced features (hooks, optimization, etc.)
 
 ---
 
