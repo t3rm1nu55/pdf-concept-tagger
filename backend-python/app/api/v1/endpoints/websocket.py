@@ -48,7 +48,8 @@ class ConnectionManager:
             for connection in self.active_connections[document_id]:
                 try:
                     await connection.send_json(message)
-                except:
+                except Exception:
+                    # Connection closed or error sending - will be removed
                     disconnected.add(connection)
             # Remove disconnected connections
             for conn in disconnected:
