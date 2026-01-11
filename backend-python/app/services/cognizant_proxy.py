@@ -107,8 +107,7 @@ class CognizantProxyLLM:
                 raise
             
             if stream:
-                async for chunk in self._handle_stream_response(response):
-                    yield chunk
+                return self._handle_stream_response(response)
             else:
                 return response.json()
     
