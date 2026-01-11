@@ -42,7 +42,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to identify all entities, concepts, and communities in documents so that I can understand what the document is about.**
 
 **Requirements:**
-- Extract entities: people, organizations, locations, dates, financial amounts, legal terms, technical terms
+- Extract entities: could include people, organizations, locations, dates, financial amounts, legal terms, technical terms *(🔧 Design Hook: Refine entity types during MVP1 analysis)*
 - Identify concepts: abstract ideas, processes, relationships, conditions
 - Discover communities: groups of related entities/concepts that form logical clusters
 - Extract both explicit mentions and implicit references
@@ -59,7 +59,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Requirements:**
 - Distinguish between explicit statements and inferred information
 - Provide confidence ratings for each extracted entity/concept (0.0-1.0 scale)
-- Identify uncertainty indicators:
+- Identify uncertainty indicators: could include *(🔧 Design Hook: Refine uncertainty indicators during MVP1 analysis)*
   - Draft documents vs. final documents
   - Conditional statements ("if X then Y")
   - Tentative language ("may", "might", "proposed")
@@ -85,13 +85,13 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 
 **Requirements:**
 - Use machine learning to match document content with known schema/domain models
-- Support multiple domain models:
+- Support multiple domain models: could include *(🔧 Design Hook: Refine domain model list and import scope during MVP1 analysis)*
   - **Microsoft Common Data Model (CDM)**: When CRM, project management, or task management concepts are detected
   - **Accounting/Financial**: GAAP, IFRS, financial reporting standards
   - **Trade/Commerce**: Incoterms, trade agreements, commercial terms
   - **Party/Entity**: Legal entity structures, organizational hierarchies
   - **Regulatory**: Industry-specific regulatory frameworks
-- When a domain model is detected, automatically import:
+- When a domain model is detected, automatically import: could include *(🔧 Design Hook: Refine import scope during MVP1 analysis)*
   - Data models (tables, fields, relationships)
   - Descriptors and definitions
   - Validation rules and constraints
@@ -131,7 +131,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 
 **Requirements:**
 - Implement hook system: when agent discovers X, automatically activate Y tasks
-- Example hooks:
+- Example hooks: could include *(🔧 Design Hook: Refine hook types and activation rules during MVP1 analysis)*
   - **If date discovered** → Activate date store tasks (normalization, temporal modeling, date relationship analysis)
   - **If legal concepts discovered** → Activate legal domain tasks (legal entity extraction, regulation mapping, compliance checking)
   - **If financial terms discovered** → Activate financial domain tasks (amount extraction, currency normalization, financial relationship mapping)
@@ -160,7 +160,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need the system to learn from patterns and improve hook configurations so that it becomes more effective over time.**
 
 **Requirements:**
-- Maintain auto-population methodology that learns from:
+- Maintain auto-population methodology that learns from: could include *(🔧 Design Hook: Refine learning sources during MVP1 analysis)*
   - User corrections
   - Successful hook activations
   - Failed hook attempts
@@ -213,7 +213,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 
 **Requirements:**
 - Maintain document pattern configurations to speed up analysis
-- Patterns should include:
+- Patterns could include: *(🔧 Design Hook: Refine pattern types during MVP1 analysis)*
   - Common document structures (sections, headers, footers)
   - Typical concept locations (dates in headers, amounts in tables)
   - Domain-specific patterns (legal terms in definitions section)
@@ -243,7 +243,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Requirements:**
 - Create local question banks (document-specific questions)
 - Create wider question banks (domain-specific, general questions)
-- Tag questions by:
+- Tag questions by: could include *(🔧 Design Hook: Refine question tagging taxonomy during MVP1 analysis)*
   - Document section
   - Entity/concept type
   - Domain model
@@ -290,7 +290,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 
 **Requirements:**
 - Extract all temporal information (dates, deadlines, milestones, durations)
-- Create complete temporal model for each document:
+- Create complete temporal model for each document: could include *(🔧 Design Hook: Refine temporal model components during MVP1 analysis)*
   - Event timeline
   - Date relationships (before, after, during)
   - Duration calculations
@@ -310,7 +310,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Requirements:**
 - Extract desired/proposed completion dates from documents
 - Store draft completion dates separately from final dates
-- Compare completion dates to:
+- Compare completion dates to: could include *(🔧 Design Hook: Refine comparison sources during MVP1 analysis)*
   - Reality priors (historical data, domain knowledge)
   - Existing domain models (standard timelines)
   - Other documents (cross-document validation)
@@ -338,6 +338,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - **Taxonomy representation**: Store hierarchical structures as trees (for navigation, browsing)
 - **Graph representation**: Store relationships as graphs (for relationship queries, path finding)
 - **Relational representation**: Store structured data in tables (for project plans, versions, tabular data)
+- Could include additional representations: *(🔧 Design Hook: Refine representation types and selection criteria during MVP1 analysis)*
 - Automatically choose optimal representation based on data characteristics
 - Support queries across all representations seamlessly
 
@@ -442,8 +443,9 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Visual document structure navigation
 - Interactive concept graph exploration
 - Search across all representations
-- Filter and facet search results
-- Breadcrumb navigation for complex queries
+- Could include navigation features: *(🔧 Design Hook: Refine navigation features during MVP1 UX design)*
+  - Filter and facet search results
+  - Breadcrumb navigation for complex queries
 
 **Success Criteria:**
 - Users can navigate document structure visually
@@ -457,9 +459,10 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Requirements:**
 - Highlight important discoveries
 - Present insights in context
-- Provide actionable recommendations
-- Show confidence and uncertainty clearly
-- Support decision-making with evidence
+- Could include insight presentation features: *(🔧 Design Hook: Refine insight presentation during MVP1 UX design)*
+  - Provide actionable recommendations
+  - Show confidence and uncertainty clearly
+  - Support decision-making with evidence
 
 **Success Criteria:**
 - Important insights are prominently displayed
