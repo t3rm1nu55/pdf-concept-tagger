@@ -124,9 +124,120 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - System provides suggestions even when no exact domain match exists
 - Custom domain models can be added and used immediately
 
-## 4. Intelligent Question Generation and Auto-Answering
+## 4. Agent Hooks and Adaptive Task Activation
 
-### Outcome 4.1: Contextual Question Banks
+### Outcome 4.1: Intelligent Agent Hooks
+**As an agent, I need automatic task activation based on discoveries so that I can work efficiently without manual configuration.**
+
+**Requirements:**
+- Implement hook system: when agent discovers X, automatically activate Y tasks
+- Example hooks:
+  - **If date discovered** → Activate date store tasks (normalization, temporal modeling, date relationship analysis)
+  - **If legal concepts discovered** → Activate legal domain tasks (legal entity extraction, regulation mapping, compliance checking)
+  - **If financial terms discovered** → Activate financial domain tasks (amount extraction, currency normalization, financial relationship mapping)
+  - **If party/entity discovered** → Activate party domain tasks (entity resolution, relationship mapping, hierarchy building)
+- Hooks should be configurable and extensible
+- Hooks should trigger appropriate domain model imports automatically
+
+**Success Criteria:**
+- Agents automatically activate relevant tasks when discoveries are made
+- Hook system reduces manual configuration by 80%+
+- Domain models are automatically imported when relevant concepts detected
+- Hook triggers are logged and traceable
+
+**Example Workflow:**
+1. HARVESTER discovers date "2024-06-30" in document
+2. Hook triggers: "date_discovered" → activate date store tasks
+3. Date store tasks automatically activated:
+   - Date normalization (convert to standard format)
+   - Temporal model creation (if not exists)
+   - Date relationship analysis (before/after/during)
+   - Deadline tracking setup
+4. Legal concept "GDPR" discovered → Hook triggers legal domain import
+5. Legal domain tasks activated: regulation mapping, compliance checking
+
+### Outcome 4.2: Adaptive Learning and Auto-Population Updates
+**As a user, I need the system to learn from patterns and improve hook configurations so that it becomes more effective over time.**
+
+**Requirements:**
+- Maintain auto-population methodology that learns from:
+  - User corrections
+  - Successful hook activations
+  - Failed hook attempts
+  - Pattern recognition across documents
+- Update hook configurations automatically based on learnings
+- Track hook effectiveness metrics (success rate, false positives, missed activations)
+- Allow users to review and approve hook configuration changes
+- Support manual hook configuration for custom patterns
+
+**Success Criteria:**
+- Hook accuracy improves over time (>5% improvement per 100 documents)
+- False positive rate decreases (<10% false activations)
+- System learns new patterns without manual configuration
+- Users can review and approve hook changes
+
+### Outcome 4.3: Assessment Indicators and Conditional Activation
+**As a user, I need to understand the reliability of extracted information so that I can make informed decisions about what to trust.**
+
+**Requirements:**
+- Implement assessment indicators with three levels:
+  - **Always True**: High confidence, explicit statements (e.g., "dates into date store" - dates are factual)
+  - **Usually True**: Medium confidence, likely but not certain (e.g., "dates indicate temporal model" - dates probably relate to timeline)
+  - **Sometimes True**: Low confidence, conditional/uncertain (e.g., "dates are indicative/aspirational/planned/expected/met/missed")
+- Use assessment indicators to conditionally activate components:
+  - **Always True** → Activate component immediately, full processing
+  - **Usually True** → Activate component with validation checks
+  - **Sometimes True** → Activate component with user confirmation or additional analysis
+- Components should activate based on answering assessment questions, not require all components always
+- Date store example:
+  - If date is "always true" (explicit completion date) → Activate full date store (normalization, temporal model, relationships)
+  - If date is "usually true" (likely deadline) → Activate date normalization and basic temporal model
+  - If date is "sometimes true" (aspirational date) → Activate date storage only, flag for review
+
+**Success Criteria:**
+- Assessment indicators accurately reflect information reliability (>85% accuracy)
+- Components activate conditionally based on assessment
+- System doesn't waste resources on low-confidence data
+- Users can see assessment reasoning for each extraction
+
+**Example:**
+- Date "2024-06-30" found with text "Proposed completion date: 2024-06-30"
+- Assessment: **Sometimes True** (aspirational/planned)
+- Component activation: Date storage only (not full temporal model)
+- Date "2024-01-15" found with text "Document created: 2024-01-15"
+- Assessment: **Always True** (explicit statement)
+- Component activation: Full date store (normalization, temporal model, relationships)
+
+### Outcome 4.4: Smart Search with Pattern Recognition
+**As a user, I need fast search that learns from document patterns so that I can find information quickly without sacrificing accuracy.**
+
+**Requirements:**
+- Maintain document pattern configurations to speed up analysis
+- Patterns should include:
+  - Common document structures (sections, headers, footers)
+  - Typical concept locations (dates in headers, amounts in tables)
+  - Domain-specific patterns (legal terms in definitions section)
+- Always perform full analysis regardless of patterns (don't skip based on patterns)
+- Look for variance from patterns (pattern violations indicate important information)
+- Use patterns to guide search, not to limit search
+- Update patterns based on document collection analysis
+
+**Success Criteria:**
+- Pattern-based search is 3x faster than exhaustive search
+- Full analysis still performed (no information missed)
+- Pattern violations are detected and flagged
+- Pattern accuracy improves over time (>90% pattern match rate)
+
+**Example:**
+- Pattern: "Dates typically in Section 3 (Timeline)"
+- Smart search: Check Section 3 first (fast path)
+- Full analysis: Still check all sections (comprehensive)
+- Variance detected: Date found in Section 7 (unusual) → Flagged as important
+- Pattern updated: "Dates can appear in Section 3 or Section 7"
+
+## 5. Intelligent Question Generation and Auto-Answering
+
+### Outcome 5.1: Contextual Question Banks
 **As a user, I need the system to automatically generate relevant questions about the document so that I can discover important information.**
 
 **Requirements:**
@@ -139,35 +250,40 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
   - Priority/importance
 - Questions should naturally emerge as discoveries progress
 - Questions should hook into discovery process (triggered by findings)
+- Questions should leverage hook system (if date found, generate date-related questions)
 
 **Success Criteria:**
 - System generates 10+ relevant questions per document section
 - Questions adapt as more information is discovered
 - Questions are prioritized by importance and answerability
 - Users can see question-answer pairs for document understanding
+- Questions are automatically generated based on hook activations
 
-### Outcome 4.2: Automatic Contextual Answering
+### Outcome 5.2: Automatic Contextual Answering
 **As a user, I need the system to automatically answer questions when information becomes available so that I don't have to manually search.**
 
 **Requirements:**
 - Auto-answer questions when relevant information is discovered
-- Provide context for answers (where in document, confidence level)
+- Provide context for answers (where in document, confidence level, assessment indicator)
 - Handle temporal questions: "What does date in this location relate to?"
 - Create full temporal model for documents (timeline of events, dates, deadlines)
 - Answer questions using discovered information + domain models + prior knowledge
+- Use assessment indicators to qualify answers (e.g., "This date is aspirational, so the answer is tentative")
 
 **Success Criteria:**
 - System answers 70%+ of generated questions automatically
-- Answers include source citations and confidence levels
+- Answers include source citations, confidence levels, and assessment indicators
 - Temporal questions are answered with complete context
 - Users can see which questions remain unanswered and why
+- Answers reflect assessment indicators (always/usually/sometimes true)
 
 **Example:**
 - Question: "What does the date in Section 3.2 relate to?"
 - System discovers: "Document X created on 2024-01-15"
-- Auto-answer: "The date 2024-01-15 relates to the document creation date. This is found in Section 3.2, which discusses project initiation. Based on the temporal model, this date precedes the completion date mentioned in Section 5.1."
+- Assessment: **Always True** (explicit statement)
+- Auto-answer: "The date 2024-01-15 relates to the document creation date. This is found in Section 3.2, which discusses project initiation. Based on the temporal model, this date precedes the completion date mentioned in Section 5.1. **Confidence: High (Always True)**"
 
-## 5. Temporal Modeling and Completion Tracking
+## 6. Temporal Modeling and Completion Tracking
 
 ### Outcome 5.1: Temporal Event Extraction and Modeling
 **As a user, I need to understand when things happened or will happen in documents so that I can track timelines and deadlines.**
@@ -213,7 +329,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Document created: 2024-01-15
 - System flags: "Proposed completion date (5.5 months) is significantly shorter than domain average (12 months). Consider validating this timeline."
 
-## 6. Multi-Representation Data Storage
+## 7. Multi-Representation Data Storage
 
 ### Outcome 6.1: Optimal Data Representation
 **As a user, I need data stored in the most appropriate format so that queries and operations are efficient and intuitive.**
@@ -252,7 +368,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Cross-representation queries work seamlessly
 - Query performance meets user expectations (<2s for complex queries)
 
-## 7. Cross-Document Intelligence
+## 8. Cross-Document Intelligence
 
 ### Outcome 7.1: Multi-Document Concept Linking
 **As a user, I need to see how concepts relate across multiple documents so that I can understand the complete picture.**
@@ -284,7 +400,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Document gaps are identified and reported
 - Collection insights are actionable
 
-## 8. Quality and Validation
+## 9. Quality and Validation
 
 ### Outcome 8.1: Data Quality Assurance
 **As a user, I need confidence that extracted information is accurate and complete so that I can rely on it for decision-making.**
@@ -317,7 +433,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Confidence scores become more accurate
 - User corrections are incorporated into future extractions
 
-## 9. User Experience Outcomes
+## 10. User Experience Outcomes
 
 ### Outcome 9.1: Intuitive Navigation and Discovery
 **As a user, I need to navigate documents and concepts intuitively so that I can find information quickly.**
@@ -351,7 +467,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Evidence is provided for all insights
 - Users can act on insights immediately
 
-## 10. Performance and Scale Outcomes
+## 11. Performance and Scale Outcomes
 
 ### Outcome 10.1: Scalable Processing
 **As a user, I need the system to handle large document collections so that it scales with my needs.**
@@ -389,8 +505,10 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - **Extraction Accuracy**: >90% for explicit entities, >75% for inferred concepts
 - **Domain Model Matching**: >85% accuracy in identifying applicable domain models
 - **Question Answering**: >70% of generated questions answered automatically
+- **Hook Accuracy**: >85% correct hook activations, <10% false positives
+- **Assessment Indicator Accuracy**: >85% accuracy in always/usually/sometimes classification
 - **User Satisfaction**: >4.0/5.0 average rating
-- **Processing Speed**: <5 minutes per 100-page document
+- **Processing Speed**: <5 minutes per 100-page document (with pattern optimization)
 - **Query Performance**: <2 seconds for complex queries
 
 ### User Value Metrics
@@ -398,6 +516,9 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - **Discovery Rate**: System discovers 3x more relationships than manual review
 - **Confidence Accuracy**: Confidence scores correlate >0.8 with actual accuracy
 - **Domain Model Utilization**: >60% of documents matched to domain models
+- **Hook Efficiency**: 80%+ reduction in manual configuration through hooks
+- **Pattern Recognition**: 3x faster search with pattern-based optimization
+- **Component Activation**: 50%+ reduction in unnecessary component processing through conditional activation
 
 ## Implementation Priorities
 
@@ -405,23 +526,34 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Document structure extraction
 - Entity/concept extraction with confidence
 - Basic graph representation
+- Assessment indicators (always/usually/sometimes true)
 
-### Phase 2: Domain Integration (Weeks 5-8)
+### Phase 2: Agent Hooks and Adaptive Learning (Weeks 5-8)
+- Hook system implementation
+- Conditional component activation
+- Auto-population methodology
+- Pattern recognition and learning
+
+### Phase 3: Domain Integration (Weeks 9-12)
 - Domain model matching
 - Schema integration
 - Generic pattern matching
+- Hook-based domain activation
 
-### Phase 3: Intelligence Layer (Weeks 9-12)
+### Phase 4: Intelligence Layer (Weeks 13-16)
 - Question generation and auto-answering
-- Temporal modeling
+- Temporal modeling with conditional activation
 - Cross-document linking
+- Smart search with patterns
 
-### Phase 4: Multi-Representation (Weeks 13-16)
+### Phase 5: Multi-Representation (Weeks 17-20)
 - Optimal storage format selection
 - Unified query interface
 - Performance optimization
+- Pattern-based optimization
 
-### Phase 5: Quality and Scale (Weeks 17-20)
+### Phase 6: Quality and Scale (Weeks 21-24)
 - Data quality assurance
-- Continuous learning
+- Continuous learning from hooks
 - Scalability improvements
+- Hook effectiveness monitoring
