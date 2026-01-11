@@ -59,8 +59,14 @@ async def analyze_pdf(
             raise HTTPException(status_code=400, detail=f"Could not extract text from page {page_number}")
         
         # 4. Extract concepts using HARVESTER agent
-        llm = CognizantProxyLLM()
-        concepts_data = await llm.extract_concepts(page_text)
+        try:
+            llm = CognizantProxyLLM()
+            concepts_data = await llm.extract_concepts(page_text)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error extracting concepts via proxy: {str(e)}"
+            )
         
         # 5. Store concepts and send WebSocket updates
         stored_concepts = []

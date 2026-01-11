@@ -147,10 +147,12 @@ class CognizantProxyLLM:
             }
         ]
         
+        # Note: response_format may need to be passed differently depending on proxy
+        # Check Cognizant proxy documentation for exact format
         response = await self.chat_completion(
             messages=messages,
             temperature=0.1,
-            response_format={"type": "json_object"}  # Force JSON response
+            response_format={"type": "json_object"} if self.provider == "openai" else None
         )
         
         # Parse response and extract concepts
