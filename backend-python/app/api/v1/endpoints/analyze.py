@@ -15,6 +15,7 @@ from app.database.postgres import get_db
 from app.models.concept import Document, Concept
 from app.services.cognizant_proxy import CognizantProxyLLM
 from app.services.pdf_processor import PDFProcessor
+from app.api.v1.endpoints.websocket import send_concept_update
 
 router = APIRouter()
 
@@ -61,7 +62,7 @@ async def analyze_pdf(
         llm = CognizantProxyLLM()
         concepts_data = await llm.extract_concepts(page_text)
         
-        # 5. Store concepts
+        # 5. Store concepts and send WebSocket updates
         stored_concepts = []
         for concept_data in concepts_data:
             concept = Concept(
@@ -78,7 +79,11 @@ async def analyze_pdf(
                 source_location={"page": page_number}
             )
             db.add(concept)
+            db.flush()  # Flush to get concept ID
             stored_concepts.append(concept)
+            
+            # Send WebSocket update
+            await send_concept_update(document_id, concept)
         
         db.commit()
         
