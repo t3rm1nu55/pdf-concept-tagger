@@ -11,6 +11,7 @@ import os
 import httpx
 from typing import List, Dict, Optional, AsyncIterator
 from dotenv import load_dotenv
+from app.core.logging import logger
 
 load_dotenv()
 
@@ -37,10 +38,14 @@ class CognizantProxyLLM:
         self.model = os.getenv("LLM_MODEL", "gpt-4-turbo-preview")
         self.timeout = float(os.getenv("COGNIZANT_PROXY_TIMEOUT", "60.0"))
         
-        if not self.proxy_endpoint:
-            raise ValueError("COGNIZANT_PROXY_ENDPOINT not set in environment")
-        if not self.proxy_api_key:
-            raise ValueError("COGNIZANT_PROXY_API_KEY not set in environment")
+            if not self.proxy_endpoint:
+                logger.error("COGNIZANT_PROXY_ENDPOINT not set in environment")
+                raise ValueError("COGNIZANT_PROXY_ENDPOINT not set in environment")
+            if not self.proxy_api_key:
+                logger.error("COGNIZANT_PROXY_API_KEY not set in environment")
+                raise ValueError("COGNIZANT_PROXY_API_KEY not set in environment")
+            
+            logger.info(f"Initialized CognizantProxyLLM: {self.provider}/{self.model}")
     
     async def chat_completion(
         self,

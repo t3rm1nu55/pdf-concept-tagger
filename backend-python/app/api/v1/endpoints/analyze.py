@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
 import json
+from app.core.logging import logger
 
 from app.database.postgres import get_db
 from app.models.concept import Document, Concept
@@ -32,6 +33,7 @@ async def analyze_pdf(
     MVP: Processes single page, extracts concepts using HARVESTER agent.
     """
     try:
+        logger.info(f"Processing PDF: {file.filename}, page {page_number}")
         # 1. Save uploaded file
         document_id = uuid.uuid4()
         file_path = f"/tmp/{document_id}_{file.filename}"
@@ -114,11 +116,18 @@ async def analyze_pdf(
             "total_concepts": len(stored_concepts)
         }
         
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
+        logger.error(f"Error processing PDF {file.filename}: {e}", exc_info=True)
         # Update document status on error
         if 'document' in locals():
-            document.status = "error"
-            db.commit()
+            try:
+                document.status = "error"
+                db.commit()
+            except Exception:
+                pass
         raise HTTPException(status_code=500, detail=f"Error processing PDF: {str(e)}")
 
 

@@ -22,6 +22,9 @@ app = FastAPI(
     version="0.1.0-mvp"
 )
 
+# Log startup
+logger.info("Starting PDF Concept Tagger MVP")
+
 # CORS Configuration
 # Decision: Allow all origins for MVP (pragmatic for development)
 # In production, specify exact origins
