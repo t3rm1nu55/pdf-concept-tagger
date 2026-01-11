@@ -16,8 +16,8 @@ export class BackendApiService {
   private logService = inject(LogService);
   public isInitialized = signal(false);
   
-  private coordinatorUrl = signal<string>('http://localhost:4000');
-  private wsUrl = signal<string>('ws://localhost:4001');
+  private coordinatorUrl = signal<string>('http://localhost:8000');
+  private wsUrl = signal<string>('ws://localhost:8000');
   private wsConnection: WebSocket | null = null;
   private wsMessageSubject = new Observable<AgentPacket>(observer => {
     // Will be set up when WebSocket connects
@@ -25,8 +25,8 @@ export class BackendApiService {
 
   constructor() {
     // Load coordinator URL from config
-    const backendUrl = this.getEnvVar('BACKEND_API_URL') || 'http://localhost:4000';
-    const backendWs = this.getEnvVar('BACKEND_WS_URL') || 'ws://localhost:4001';
+    const backendUrl = this.getEnvVar('BACKEND_API_URL') || 'http://localhost:8000';
+    const backendWs = this.getEnvVar('BACKEND_WS_URL') || 'ws://localhost:8000';
     
     this.coordinatorUrl.set(backendUrl);
     this.wsUrl.set(backendWs);
@@ -124,42 +124,14 @@ export class BackendApiService {
 
   /**
    * Connect to WebSocket for real-time agent updates
+   * Note: WebSocket connections are established per-document in the analyze endpoint.
+   * This method is kept for backward compatibility but WebSocket updates come via
+   * the streaming response from analyzePageStream.
    */
   private connectWebSocket(): void {
-    try {
-      const ws = new WebSocket(this.wsUrl());
-      
-      ws.onopen = () => {
-        console.log('[BackendAPI] WebSocket connected');
-        this.wsConnection = ws;
-      };
-      
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type === 'agent:message') {
-            const packet = data.data as AgentPacket;
-            // Optionally handle real-time updates here
-            // The main stream will handle most packets
-          }
-        } catch (e) {
-          console.warn('[BackendAPI] WebSocket message parse error:', e);
-        }
-      };
-      
-      ws.onerror = (error) => {
-        console.error('[BackendAPI] WebSocket error:', error);
-      };
-      
-      ws.onclose = () => {
-        console.log('[BackendAPI] WebSocket disconnected');
-        this.wsConnection = null;
-        // Reconnect after delay
-        setTimeout(() => this.connectWebSocket(), 5000);
-      };
-    } catch (error) {
-      console.warn('[BackendAPI] WebSocket connection failed:', error);
-    }
+    // MVP: WebSocket is handled per-document in analyzePageStream
+    // Global connection not needed - updates come via streaming response
+    console.log('[BackendAPI] WebSocket will be connected per-document during analysis');
   }
 
   /**
