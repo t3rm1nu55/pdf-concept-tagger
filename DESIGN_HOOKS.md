@@ -110,31 +110,114 @@ Areas requiring analysis and refinement:
 - Navigation features
 - Insight presentation features
 
-## Requirements-to-Proposal Workflow
+## Parallel Workflows: Fast Demo + Full Design
+
+### Overview
+Run a **Fast Demo Workflow** in parallel with the **Full Design Process** to:
+- Validate core concepts quickly
+- Get early user feedback
+- Inform design decisions with real usage
+- Reduce risk through rapid iteration
+- Keep stakeholders engaged with visible progress
+
+### Fast Demo Workflow (Parallel Track)
+
+**Timeline: Weeks 1-3 (runs parallel to design)**
+
+#### Week 1: Fast Demo Setup
+**Goal**: Build minimal viable demo in 1 week
+
+**Activities:**
+- **Day 1-2**: Set up basic infrastructure
+  - Simple backend API (FastAPI or Express)
+  - Basic frontend (React/Vite or Angular)
+  - Simple database (SQLite or PostgreSQL)
+  - Basic PDF upload and processing
+
+- **Day 3-4**: Core extraction demo
+  - Basic entity extraction (dates, names, organizations)
+  - Simple confidence scoring (high/medium/low)
+  - Basic graph visualization (D3.js or similar)
+  - Document structure extraction (basic)
+
+- **Day 5**: Demo preparation
+  - Prepare sample documents
+  - Create demo script
+  - Test demo flow
+
+**Deliverables:**
+- Working demo application
+- Demo script and sample data
+- Quick demo video/screenshots
+
+**Constraints:**
+- Use existing/quick solutions (no custom design needed)
+- Hardcode where necessary (no full configuration)
+- Focus on core value demonstration
+- Accept technical debt for speed
+
+#### Week 2: Demo Iteration
+**Goal**: Refine demo based on initial feedback
+
+**Activities:**
+- Gather feedback from demo sessions
+- Add missing critical features
+- Improve visualizations
+- Fix major usability issues
+
+**Deliverables:**
+- Improved demo
+- Feedback report
+- Feature priority list
+
+#### Week 3: Demo Validation
+**Goal**: Validate core assumptions
+
+**Activities:**
+- User testing sessions
+- Collect quantitative metrics
+- Document learnings
+- Feed insights into full design
+
+**Deliverables:**
+- User testing report
+- Validated assumptions list
+- Design recommendations
+
+### Full Design Process (Main Track)
+
+**Timeline: Weeks 1-5 (runs parallel to demo)**
 
 ### Phase 1: Requirements Analysis (Week 1)
 1. **Review Requirements Document**
    - Identify all design hooks
    - Categorize hooks by type (API, Data Model, UX, MVP/v1.0, Components)
    - Prioritize hooks by implementation phase
+   - **Incorporate demo learnings** (from parallel demo track)
 
 2. **Stakeholder Interviews**
    - Understand user needs for each outcome
    - Gather domain expertise for data modeling
    - Identify UI/UX preferences and constraints
+   - **Validate with demo observations**
 
 3. **Technical Constraints Analysis**
    - Review existing architecture
    - Identify technology stack constraints
    - Assess integration requirements
+   - **Learn from demo technical decisions**
 
 ### Phase 2: Design Exercises (Weeks 2-4)
+
+**Note**: Design exercises run parallel to demo iteration and validation. Demo learnings inform design decisions.
 
 #### API Design Exercise (Week 2)
 **Inputs:**
 - API Design Hooks from requirements
 - Technical constraints
 - Integration requirements
+- **Demo API patterns** (what worked/didn't work)
+- **Demo performance observations**
 
 **Activities:**
 - Design REST/GraphQL API endpoints
@@ -142,12 +225,14 @@ Areas requiring analysis and refinement:
 - Design WebSocket/SSE protocols
 - Create API documentation
 - Design error handling and status codes
+- **Validate against demo API usage**
 
 **Outputs:**
 - API specification document
 - OpenAPI/Swagger documentation
 - API mockups/examples
 - Integration test scenarios
+- **Demo-to-production migration guide**
 
 #### Data Model Design Exercise (Week 2-3)
 **Inputs:**
@@ -174,6 +259,9 @@ Areas requiring analysis and refinement:
 - UX Design Hooks from requirements
 - User personas and workflows
 - Common component candidates
+- **Demo user testing results**
+- **Demo usability observations**
+- **Demo user feedback**
 
 **Activities:**
 - Create user journey maps
@@ -182,6 +270,7 @@ Areas requiring analysis and refinement:
 - Create interaction patterns
 - Design information architecture
 - Create design system/style guide
+- **Incorporate demo learnings into designs**
 
 **Outputs:**
 - User journey maps
@@ -190,6 +279,7 @@ Areas requiring analysis and refinement:
 - Interaction specifications
 - Design system/style guide
 - Prototypes (Figma/Sketch)
+- **UX improvements based on demo feedback**
 
 #### Component Design Exercise (Week 3-4)
 **Inputs:**
@@ -233,6 +323,9 @@ Areas requiring analysis and refinement:
 - All design exercise outputs
 - Requirements document
 - MVP/v1.0 planning
+- **Demo validation results**
+- **Demo technical learnings**
+- **Demo user feedback**
 
 **Activities:**
 - Synthesize design outputs
@@ -240,6 +333,8 @@ Areas requiring analysis and refinement:
 - Define acceptance criteria
 - Estimate effort and timeline
 - Identify risks and mitigation
+- **Incorporate validated demo features**
+- **Plan demo-to-production migration**
 
 **Outputs:**
 - Technical proposal document
@@ -247,6 +342,110 @@ Areas requiring analysis and refinement:
 - Effort estimates
 - Risk assessment
 - Acceptance criteria
+- **Demo-to-production migration plan**
+- **Validated feature priorities**
+
+## Fast Demo Workflow Details
+
+### Fast Demo Scope
+
+#### Must Have (Core Demo)
+- ✅ PDF upload and basic processing
+- ✅ Entity extraction (dates, names, organizations)
+- ✅ Simple confidence scoring
+- ✅ Basic graph visualization
+- ✅ Document structure display
+- ✅ Search functionality
+
+#### Should Have (Enhanced Demo)
+- ⚠️ Multi-document support (basic)
+- ⚠️ Concept relationships
+- ⚠️ Assessment indicators (simplified)
+- ⚠️ Question generation (basic)
+
+#### Nice to Have (If Time Permits)
+- 💡 Domain model matching (hardcoded examples)
+- 💡 Temporal modeling (basic)
+- 💡 Hook system (simplified)
+
+### Fast Demo Technology Stack
+
+**Backend:**
+- FastAPI (Python) or Express (Node.js) - quick setup
+- SQLite or PostgreSQL - simple database
+- Basic PDF processing library
+- Simple LLM integration (direct API calls)
+
+**Frontend:**
+- React + Vite or Angular - rapid development
+- D3.js for graph visualization
+- Tailwind CSS for quick styling
+- Basic state management
+
+**No Need For (in demo):**
+- Complex data models (use simple schemas)
+- Full API design (use basic REST)
+- Production-ready components (use quick implementations)
+- Comprehensive error handling
+- Full test coverage
+
+### Demo-to-Production Migration Strategy
+
+**Week 4-5: Migration Planning**
+1. **Identify Demo Code to Keep**
+   - Core algorithms that worked well
+   - UI patterns users liked
+   - API patterns that performed well
+
+2. **Identify Demo Code to Replace**
+   - Hardcoded values → Configuration system
+   - Simple schemas → Full data models
+   - Basic components → Production components
+   - Quick fixes → Proper error handling
+
+3. **Create Migration Path**
+   - Incremental migration plan
+   - Feature parity checklist
+   - Technical debt resolution plan
+
+### Parallel Workflow Benefits
+
+1. **Risk Reduction**
+   - Validate assumptions early
+   - Identify showstoppers before full design
+   - Test technical feasibility
+
+2. **Design Validation**
+   - Real usage informs design decisions
+   - User feedback shapes UX design
+   - Performance data guides architecture
+
+3. **Stakeholder Engagement**
+   - Visible progress keeps stakeholders engaged
+   - Demo provides concrete discussion points
+   - Early wins build confidence
+
+4. **Faster Time to Value**
+   - Demo can be productionized incrementally
+   - Core features validated and ready
+   - Reduced rework from invalidated assumptions
+
+### Coordination Between Tracks
+
+**Daily Standups:**
+- Demo team shares: What worked, what didn't, user feedback
+- Design team shares: Design decisions, constraints, questions
+- Both teams: Identify blockers, coordinate changes
+
+**Weekly Sync:**
+- Demo learnings → Design inputs
+- Design questions → Demo experiments
+- Shared decisions on critical paths
+
+**Documentation:**
+- Demo team: Document all learnings, decisions, code patterns
+- Design team: Reference demo learnings in design docs
+- Both: Maintain shared knowledge base
 
 ## Design Hook Checklist
 
@@ -314,10 +513,68 @@ Each component should be designed with:
 - Loading states
 - Empty states
 
+## Fast Demo Quick Start Guide
+
+### Week 1 Demo Checklist
+
+**Day 1: Setup**
+- [ ] Initialize backend project (FastAPI/Express)
+- [ ] Initialize frontend project (React/Vite or Angular)
+- [ ] Set up database (SQLite or PostgreSQL)
+- [ ] Configure PDF processing library
+- [ ] Set up basic LLM API integration
+
+**Day 2: Core Features**
+- [ ] PDF upload endpoint
+- [ ] Basic entity extraction (dates, names)
+- [ ] Simple confidence scoring
+- [ ] Store extracted entities in database
+
+**Day 3: Visualization**
+- [ ] Basic graph visualization (D3.js)
+- [ ] Document structure display
+- [ ] Entity list view
+- [ ] Simple search functionality
+
+**Day 4: Polish**
+- [ ] Improve UI styling
+- [ ] Add basic error handling
+- [ ] Create sample documents
+- [ ] Test end-to-end flow
+
+**Day 5: Demo Prep**
+- [ ] Create demo script
+- [ ] Prepare presentation
+- [ ] Record demo video
+- [ ] Document demo features
+
+### Demo Success Criteria
+
+**Technical:**
+- ✅ Can upload and process PDF
+- ✅ Extracts at least 3 entity types
+- ✅ Displays results in graph
+- ✅ Basic search works
+- ✅ No critical bugs
+
+**User Experience:**
+- ✅ Demo is understandable without explanation
+- ✅ Core value is visible
+- ✅ Users can interact with results
+- ✅ Visualizations are clear
+
+**Design Input:**
+- ✅ Identifies what users care about most
+- ✅ Reveals usability issues
+- ✅ Validates core assumptions
+- ✅ Provides performance baseline
+
 ## Next Steps
 
-1. **Schedule Design Exercises**: Plan design sessions for each hook category
-2. **Assign Designers**: Assign API, data model, and UX designers
-3. **Create Design Templates**: Standardize design documentation format
-4. **Set Review Process**: Define design review and approval workflow
-5. **Track Design Progress**: Use this document to track completion of design hooks
+1. **Kickoff Both Tracks**: Start demo and design in parallel
+2. **Assign Teams**: Demo team (2-3 developers) + Design team (API/UX/Data designers)
+3. **Set Up Communication**: Daily standups, weekly syncs
+4. **Create Demo Repository**: Separate repo/branch for fast demo
+5. **Schedule Demo Sessions**: Plan user testing for Week 3
+6. **Track Both Tracks**: Use project management tool to track demo and design progress
+7. **Document Learnings**: Capture all insights for design incorporation
