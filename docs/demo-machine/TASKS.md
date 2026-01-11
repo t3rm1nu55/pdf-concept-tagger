@@ -560,15 +560,51 @@ Each task includes:
 - Add concept highlighting
 - Style with Tailwind
 
-#### 🔴 T7.3: Port Graph Visualization
-**Dependencies**: T1.10, T7.1, T6.3
-**Effort**: 6 hours
+#### 🔴 T7.3: Port Graph Visualization (D3.js Live Modeling)
+**Dependencies**: T1.10, T7.1, T6.3, T6.5
+**Effort**: 8 hours
+**Design Reference**: [DESIGN.md](DESIGN.md#graph-visualization-d3js) - Section 2
+
 **Tasks**:
-- Integrate D3 graph with API
-- Add real-time updates
-- Add node/edge interactions
-- Add filtering and search
-- Add export functionality
+- Port D3.js graph from prototype (`src/services/graph.service.ts`):
+  - Force-directed simulation (same as prototype)
+  - Node types: Concepts (circles), Hypernodes (squares), Domains/Priors (diamonds)
+  - Visual styling: Same colors, glow effects, arrows
+  - Interactive features: Drag, click, hover
+- Integrate with API (`GET /api/v1/graph`)
+- **Add real-time updates via WebSocket**:
+  - Subscribe to document-specific WebSocket stream
+  - Handle `concept_extracted` events → Add/update nodes
+  - Handle `relationship_created` events → Add/update edges
+  - Preserve node positions during updates (smooth transitions)
+- Add node/edge interactions:
+  - Click node → Show concept details
+  - Drag node → Reposition
+  - Hover → Tooltip
+  - Highlight related nodes
+- Add filtering and search:
+  - Filter by node type (concepts, hypernodes, domains)
+  - Filter by confidence level
+  - Search nodes by term
+- Add export functionality (PNG, SVG, JSON)
+- Add zoom/pan controls (if not in prototype)
+
+**Acceptance Criteria**:
+- [ ] Graph visualization matches prototype functionality
+- [ ] Real-time updates work via WebSocket (nodes appear as agents discover them)
+- [ ] Node positions preserved during updates (no jumping)
+- [ ] All node types render correctly (concepts, hypernodes, domains/priors)
+- [ ] Interactive features work (drag, click, hover)
+- [ ] Visual styling matches prototype (colors, effects, layout)
+- [ ] Performance: Smooth updates with 100+ nodes
+- [ ] Export functionality works (PNG, SVG, JSON)
+
+**Implementation Notes**:
+- Use same D3.js version as prototype for consistency
+- Port `GraphService` logic to React hooks (`useGraph.ts`)
+- WebSocket integration: Subscribe to `/ws?document_id={id}` for live updates
+- Preserve node positions: Merge new nodes with existing positions
+- Match prototype visual style exactly (dark theme, node colors, effects)
 
 #### 🟡 T7.4: Create Concept List Component
 **Dependencies**: T7.1, T1.8

@@ -767,9 +767,90 @@ LIMIT 10
 4. **Relationships**: View related concepts
 5. **Context**: See source location in document
 
-### 2. Component Library
+### 2. Graph Visualization (D3.js)
 
-#### 2.1 Common Components
+#### 2.1 Live Modeling Visualization
+
+**Component**: `GraphView.tsx` (D3.js Force-Directed Graph)
+
+**Features** (matching prototype):
+- ✅ **Real-time updates**: Live graph updates via WebSocket as agents discover concepts
+- ✅ **Force-directed layout**: D3 force simulation with collision detection
+- ✅ **Interactive nodes**: Drag nodes, click to inspect, hover for details
+- ✅ **Node types**: 
+  - Concepts (circles, indigo) - extracted entities/concepts
+  - Hypernodes (squares, orange) - context groupings
+  - Domains/Priors (diamonds, pink) - domain models and reality priors
+- ✅ **Visual effects**: Glow on selection, arrows on edges, link labels
+- ✅ **Live streaming**: Graph updates as agents process documents in real-time
+- ✅ **Node highlighting**: Highlight related nodes on selection
+- ✅ **Responsive**: Auto-resize with container, maintains node positions
+
+**Implementation**:
+```typescript
+// src/components/graph/GraphView.tsx
+import * as d3 from 'd3';
+import { useEffect, useRef } from 'react';
+import { useWebSocket } from '@/hooks/useWebSocket';
+
+interface GraphViewProps {
+  documentId?: string;
+  onNodeClick?: (node: GraphNode) => void;
+}
+
+export function GraphView({ documentId, onNodeClick }: GraphViewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
+  
+  // WebSocket for live updates
+  const { data: graphUpdate } = useWebSocket(`/ws?document_id=${documentId}`);
+  
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    // Initialize D3 force simulation (same as prototype)
+    const simulation = d3.forceSimulation<GraphNode, GraphLink>()
+      .force('link', d3.forceLink().id(d => d.id).distance(150))
+      .force('charge', d3.forceManyBody().strength(-400))
+      .force('center', d3.forceCenter())
+      .force('collide', d3.forceCollide(30));
+    
+    simulationRef.current = simulation;
+    
+    // Render graph...
+  }, []);
+  
+  // Update graph on WebSocket messages
+  useEffect(() => {
+    if (graphUpdate?.type === 'concept_extracted' || graphUpdate?.type === 'relationship_created') {
+      updateGraph(graphUpdate.data);
+    }
+  }, [graphUpdate]);
+  
+  return <div ref={containerRef} className="w-full h-full" />;
+}
+```
+
+**WebSocket Integration**:
+- Subscribe to document-specific updates: `ws://localhost:8001/ws?document_id={id}`
+- Receive real-time events:
+  - `concept_extracted` → Add/update node
+  - `relationship_created` → Add/update edge
+  - `progress_update` → Show processing status
+- Graph updates smoothly without full re-render (preserves node positions)
+
+**Design Decisions**:
+- ✅ Keep D3.js (same as prototype) for maximum control and performance
+- ✅ Real-time updates via WebSocket (not polling)
+- ✅ Preserve node positions during updates (smooth transitions)
+- ✅ Same visual style as prototype (dark theme, node types, colors)
+- ✅ Interactive features match prototype (drag, click, highlight)
+
+---
+
+### 3. Component Library
+
+#### 3.1 Common Components
 
 **Filter Component** (`FilterBar.tsx`):
 ```typescript
@@ -804,6 +885,19 @@ interface CitationProps {
     location?: { x: number; y: number };
   };
   onClick?: () => void;
+}
+```
+
+**Graph Visualization** (`GraphView.tsx`):
+```typescript
+interface GraphViewProps {
+  documentId?: string;
+  nodes?: GraphNode[];
+  edges?: GraphEdge[];
+  layout?: "force" | "hierarchical" | "circular";
+  onNodeClick?: (node: GraphNode) => void;
+  onNodeDrag?: (node: GraphNode) => void;
+  realTime?: boolean;  // Enable WebSocket live updates
 }
 ```
 
@@ -844,6 +938,21 @@ interface ProgressBarProps {
 - **Layout**: 2-column (Concept Info | Relationships)
 - **Components**: Concept card, relationship graph, source citation
 - **Interactions**: Expand relationships, navigate to source
+
+#### 3.3 Graph Visualization View (Live Modeling)
+- **Layout**: Full-screen or panel view
+- **Components**: D3.js force-directed graph, legend, controls
+- **Features**:
+  - **Live updates**: Graph updates in real-time as agents process documents
+  - **Node types**: Concepts (circles), Hypernodes (squares), Domains/Priors (diamonds)
+  - **Interactions**: Drag nodes, click to inspect, zoom/pan, filter by type
+  - **Visual effects**: Glow on selection, animated edges, link labels
+- **Real-time**: WebSocket connection for live concept/relationship discovery
+- **Interactions**: 
+  - Click node → Show concept details in side panel
+  - Drag node → Reposition in graph
+  - Hover → Show tooltip with concept info
+  - Filter → Show/hide node types
 
 #### 3.3 Document Structure View
 - **Layout**: Tree navigation + content view
