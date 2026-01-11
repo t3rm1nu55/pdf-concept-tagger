@@ -9,6 +9,14 @@ export interface GraphNode extends d3.SimulationNodeDatum {
   radius?: number;
   conceptRef?: any;
   term?: string;
+  // D3 simulation properties (from SimulationNodeDatum)
+  x?: number;
+  y?: number;
+  fx?: number | null;
+  fy?: number | null;
+  vx?: number;
+  vy?: number;
+  index?: number;
 }
 
 export interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
