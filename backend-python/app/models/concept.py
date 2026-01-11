@@ -42,7 +42,7 @@ class Concept(Base):
     source_location = Column(JSON)  # {page, section, x, y}
     ui_group = Column(String(100))
     extracted_by = Column(String(100))  # HARVESTER, ARCHITECT, etc.
-    metadata = Column(JSON)
+    concept_metadata = Column(JSON)  # Renamed from 'metadata' (reserved in SQLAlchemy)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
