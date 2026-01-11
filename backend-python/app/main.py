@@ -12,6 +12,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
+from app.api.v1.router import router as api_v1_router
+
 load_dotenv()
 
 app = FastAPI(
@@ -31,6 +33,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include API routers
+app.include_router(api_v1_router, prefix="/api/v1")
+
 
 @app.get("/health")
 async def health_check():
@@ -48,5 +53,10 @@ async def root():
     return {
         "message": "PDF Concept Tagger MVP API",
         "version": "0.1.0-mvp",
-        "docs": "/docs"
+        "docs": "/docs",
+        "endpoints": {
+            "health": "/health",
+            "analyze": "/api/v1/analyze",
+            "concepts": "/api/v1/concepts"
+        }
     }

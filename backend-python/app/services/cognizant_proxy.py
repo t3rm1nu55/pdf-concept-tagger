@@ -49,7 +49,7 @@ class CognizantProxyLLM:
         max_tokens: Optional[int] = None,
         stream: bool = False,
         **kwargs
-    ) -> Dict:
+    ):
         """
         Call LLM via Cognizant proxy for chat completion.
         
@@ -95,7 +95,8 @@ class CognizantProxyLLM:
             response.raise_for_status()
             
             if stream:
-                return self._handle_stream_response(response)
+                async for chunk in self._handle_stream_response(response):
+                    yield chunk
             else:
                 return response.json()
     
