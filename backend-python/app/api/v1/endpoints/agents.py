@@ -10,7 +10,7 @@ from app.core.logging import logger
 router = APIRouter()
 
 
-@router.get("/agents")
+@router.get("")
 async def get_agents():
     """
     Get agent statuses.
