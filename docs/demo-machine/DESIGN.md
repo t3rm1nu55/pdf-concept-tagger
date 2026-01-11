@@ -1341,47 +1341,168 @@ class HookSystem:
     """Hook system for automatic task activation"""
     def __init__(self):
         self.hooks: Dict[str, List[Hook]] = {}
+        self.concept_type_requirements: Dict[str, List[str]] = {}  # Concept type → required tasks
         self.load_hooks()
+        self.load_concept_requirements()
     
     def register(self, trigger: str, action: Callable, config: dict):
         """Register a hook"""
         hook = Hook(trigger=trigger, action=action, config=config)
         self.hooks[trigger].append(hook)
     
+    def register_concept_requirements(self, concept_type: str, required_tasks: List[str]):
+        """Register required tasks for a concept type (inherited must-dos)"""
+        self.concept_type_requirements[concept_type] = required_tasks
+    
     async def trigger(self, trigger: str, context: dict):
         """Trigger hooks for a given event"""
         for hook in self.hooks.get(trigger, []):
             if hook.enabled:
                 await hook.execute(context)
+    
+    async def inherit_requirements(self, concept: Concept):
+        """Inherit required tasks based on concept type existence"""
+        concept_type = concept.data_type or concept.type
+        required_tasks = self.concept_type_requirements.get(concept_type, [])
+        
+        for task in required_tasks:
+            await self.activate_task(task, concept)
 ```
 
-### 2. Hook Types
+### 2. Concept Type Requirements (Inherited Must-Dos)
+
+**Research Pattern**: When certain concept types are discovered, they automatically inherit required tasks/requirements based on their type. This is a declarative pattern where concept types define their "must dos."
+
+**Concept Type Requirements Registry**:
+```python
+# Concept types inherit required tasks
+hook_system.register_concept_requirements("date", [
+    "normalize_date",           # Must normalize date format
+    "create_temporal_model",    # Must create temporal model if not exists
+    "analyze_date_relationships",  # Must analyze before/after/during
+    "track_deadlines"           # Must track if deadline-related
+])
+
+hook_system.register_concept_requirements("legal", [
+    "extract_legal_entities",   # Must extract legal entities
+    "map_regulations",          # Must map to regulations
+    "check_compliance",         # Must check compliance
+    "import_legal_domain"       # Must import legal domain model
+])
+
+hook_system.register_concept_requirements("financial", [
+    "extract_amounts",          # Must extract monetary amounts
+    "normalize_currency",       # Must normalize currency
+    "map_financial_relationships",  # Must map financial relationships
+    "import_financial_domain"   # Must import financial domain model
+])
+
+hook_system.register_concept_requirements("party", [
+    "resolve_entity",           # Must resolve entity identity
+    "map_relationships",        # Must map party relationships
+    "build_hierarchy",          # Must build organizational hierarchy
+    "import_party_domain"       # Must import party domain model
+])
+```
+
+**Automatic Inheritance**:
+```python
+# When HARVESTER discovers a concept
+async def on_concept_discovered(concept: Concept):
+    # 1. Store concept
+    await store_concept(concept)
+    
+    # 2. Inherit required tasks based on concept type
+    await hook_system.inherit_requirements(concept)
+    
+    # 3. Trigger domain-specific hooks
+    if concept.data_type == "legal":
+        await hook_system.trigger("legal_concept_discovered", {"concept": concept})
+```
+
+### 3. Hook Types
 
 **Date Discovery Hook**:
 ```python
 @hook_system.register("date_discovered")
 async def activate_date_store(context):
-    # Activate date normalization
-    # Create temporal model
-    # Analyze date relationships
-    pass
+    concept = context["concept"]
+    # Inherited requirements automatically activated:
+    # - normalize_date
+    # - create_temporal_model
+    # - analyze_date_relationships
+    # - track_deadlines
+    
+    # Additional hook-specific actions
+    await normalize_date(concept)
+    await create_temporal_model_if_needed(concept.document_id)
+    await analyze_date_relationships(concept)
+    await track_deadlines(concept)
 ```
 
 **Domain Model Hook**:
 ```python
 @hook_system.register("domain_match_found")
 async def import_domain_model(context):
+    domain = context["domain"]
+    concept = context["concept"]
+    
     # Import domain model schema
+    domain_model = await load_domain_model(domain.name)
+    
     # Activate domain-specific extraction
+    # Inherit domain-specific requirements
+    await hook_system.inherit_requirements(concept)
+    
     # Map concepts to schema
-    pass
+    await map_to_domain_schema(concept, domain_model)
 ```
 
+**Concept Type-Based Inheritance**:
+```python
+# When concept discovered, automatically inherit requirements
+async def process_concept(concept: Concept):
+    # 1. Store concept
+    await store_concept(concept)
+    
+    # 2. Inherit required tasks (must-dos) based on concept type
+    required_tasks = hook_system.concept_type_requirements.get(
+        concept.data_type or concept.type, []
+    )
+    
+    for task in required_tasks:
+        await execute_required_task(task, concept)
+    
+    # 3. Trigger hooks
+    await hook_system.trigger(f"{concept.data_type}_discovered", {"concept": concept})
+```
+
+### 4. Requirement Inheritance Rules
+
+**Rule 1: Type-Based Inheritance**
+- When concept type is discovered, inherit all required tasks for that type
+- Tasks are executed automatically (no user confirmation needed for "always true" assessment)
+
+**Rule 2: Domain-Based Inheritance**
+- When domain is matched, inherit domain-specific requirements
+- Domain requirements override generic type requirements
+
+**Rule 3: Assessment-Based Conditional Inheritance**
+- **Always True**: Inherit all required tasks, execute fully
+- **Usually True**: Inherit required tasks, execute with validation
+- **Sometimes True**: Inherit required tasks, execute conditionally or flag for review
+
+**Rule 4: Composition**
+- Multiple concept types can trigger multiple requirement sets
+- Requirements are composed (not replaced) when multiple types apply
+
 **Design Decisions**:
-- ✅ Event-driven architecture
-- ✅ Configurable hooks
-- ✅ Hook effectiveness tracking
-- ✅ Easy to extend
+- ✅ Declarative pattern: Concept types define their requirements
+- ✅ Automatic inheritance: No manual configuration needed
+- ✅ Extensible: Easy to add new concept types and requirements
+- ✅ Event-driven: Hooks trigger based on concept discovery
+- ✅ Assessment-aware: Conditional execution based on confidence
+- ✅ Domain-aware: Domain models can override type requirements
 
 ---
 
