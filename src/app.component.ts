@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, signal, inject, effect, ElementRef, OnDestroy, viewChild, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GeminiService, AgentPacket } from './services/gemini.service';
+import { AgentPacket } from './services/gemini.service';
+import { BackendApiService } from './services/backend-api.service';
 import { StorageService } from './services/storage.service';
 import { GraphService, GraphNode } from './services/graph.service';
 import { LogService, LogEntry } from './services/log.service';
-import { AgentCoordinatorService } from './services/agent-coordinator.service';
 import { LockerComponent } from './components/locker.component';
 import { InspectorComponent } from './components/inspector.component';
 import { Subscription, Subject } from 'rxjs';
@@ -23,11 +23,10 @@ declare const pdfjsLib: any;
   `]
 })
 export class AppComponent implements OnDestroy, OnInit {
-  geminiService = inject(GeminiService);
+  backendApi = inject(BackendApiService);
   storageService = inject(StorageService);
   graphService = inject(GraphService);
   logService = inject(LogService);
-  agentCoordinator = inject(AgentCoordinatorService);
 
   graphContainer = viewChild<ElementRef<HTMLDivElement>>('graphContainer');
   logsContainer = viewChild<ElementRef<HTMLDivElement>>('logsContainer');
@@ -84,9 +83,9 @@ export class AppComponent implements OnDestroy, OnInit {
     }
     
     effect(() => {
-        if (!this.geminiService.isInitialized()) {
+        if (!this.backendApi.isInitialized()) {
             this.processingState.set('uninitialized');
-            this.errorMessage.set('Gemini Service could not be initialized. Check API_KEY.');
+            this.errorMessage.set('Backend API Service could not be initialized. Check BACKEND_API_URL.');
         }
     });
 
@@ -253,7 +252,7 @@ export class AppComponent implements OnDestroy, OnInit {
       
       this.logService.addSystemLog(`Batch ${retryCount + 1} started. Known concepts: ${existingTerms.length}`);
 
-      this.streamSubscription = this.geminiService.analyzePageStream(imageDataUrl, pageNumber, existingTerms).subscribe({
+      this.streamSubscription = this.backendApi.analyzePageStream(imageDataUrl, pageNumber, existingTerms).subscribe({
           next: (packet: AgentPacket) => {
               if (packet.intent === 'TASK_COMPLETE') {
                   this.taskComplete = true;
@@ -281,9 +280,6 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   handlePacket(packet: AgentPacket) {
-      // Publish packet to agent coordinator (A2A pattern)
-      this.agentCoordinator.publishPacket(packet);
-      
       if (packet.sender !== 'SYSTEM') {
           this.updateAgents(packet.sender, 'Processing...', 'active');
           setTimeout(() => {
@@ -296,13 +292,11 @@ export class AppComponent implements OnDestroy, OnInit {
       switch (packet.intent) {
           case 'ROUND_START':
               if (c.round_id) {
-                  const round = this.agentCoordinator.startRound(c.round_id, c.round_name || 'Active');
                   this.currentRound.set({ number: c.round_id, name: c.round_name || 'Active' });
               }
               break;
           case 'GRAPH_UPDATE':
               if (this.currentRound().number === 0) {
-                 const round = this.agentCoordinator.startRound(1, 'Auto-Harvest');
                  this.currentRound.set({ number: 1, name: 'Auto-Harvest' });
               }
 
@@ -313,8 +307,7 @@ export class AppComponent implements OnDestroy, OnInit {
               if (c.prior) this.handlePrior(c.prior);
               break;
           case 'TASK_COMPLETE':
-              // Complete current round in coordinator
-              this.agentCoordinator.completeRound();
+              // Round completed by backend
               break;
           case 'HYPOTHESIS':
               if (c.hypothesis) {
@@ -432,7 +425,6 @@ export class AppComponent implements OnDestroy, OnInit {
   reset() {
       this.storageService.clearDatabase();
       this.logService.clear();
-      this.agentCoordinator.reset();
       this.localNodeMap.clear();
       this.localEdgeMap.clear();
       this.storedNodes.set([]);
