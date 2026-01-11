@@ -7,6 +7,7 @@ import os
 import base64
 import json
 from typing import List, Optional, Dict, Any
+from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -22,6 +23,14 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema import HumanMessage, AIMessage
 from langchain.tools import Tool
 from langchain.agents import initialize_agent, AgentType
+
+# Import shared models
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+from shared.models import (
+    Concept, Domain, Relationship, Taxonomy, AgentPacket,
+    AnalyzeRequest, ExperimentRequest
+)
 
 load_dotenv()
 
@@ -62,48 +71,21 @@ def get_llm():
     else:
         raise ValueError(f"Unknown LLM provider: {LLM_PROVIDER}")
 
-# Request/Response Models
-class AnalyzeRequest(BaseModel):
-    image_base64: str
-    page_number: int
-    exclude_terms: List[str] = []
-    prompt_override: Optional[str] = None
-    model_override: Optional[str] = None
+# Use shared models (imported above)
 
-class Concept(BaseModel):
-    id: str
-    term: str
-    type: str
-    dataType: Optional[str] = None
-    category: str
-    explanation: str
-    confidence: float
-    ui_group: str
+# Load prompt templates from files
+PROMPTS_DIR = Path(__file__).parent / "prompts"
 
-class AgentPacket(BaseModel):
-    sender: str
-    intent: str
-    content: Dict[str, Any]
+def load_prompt(name: str) -> str:
+    """Load prompt template from file"""
+    prompt_file = PROMPTS_DIR / f"{name}.txt"
+    if prompt_file.exists():
+        return prompt_file.read_text()
+    return f"Default prompt for {name}"
 
-# Prompt Templates (Experiment-friendly)
-HARVESTER_PROMPT = """You are the HARVESTER agent extracting concepts from a PDF page.
-
-Extract entities, concepts, and relationships from this document page.
-
-Return a JSON array of concept objects. Each concept should have:
-- id: unique identifier
-- term: the actual text/name
-- type: 'concept' or 'hypernode'
-- dataType: 'entity' | 'date' | 'location' | 'organization' | 'person' | 'money' | 'legal' | 'condition'
-- category: classification
-- explanation: brief description
-- confidence: 0.0-1.0
-- ui_group: grouping category
-
-Page: {page_number}
-Exclude terms: {exclude_terms}
-
-Output only valid JSON array."""
+HARVESTER_PROMPT = load_prompt("harvester")
+ARCHITECT_PROMPT = load_prompt("architect")
+CURATOR_PROMPT = load_prompt("curator")
 
 # In-memory storage for demo (replace with real DBs later)
 concepts_store = []
@@ -127,11 +109,13 @@ async def analyze(request: AnalyzeRequest):
     
     # Get LLM
     llm = get_llm()
+    if request.model_override:
+        llm.model_name = request.model_override
     
     # Build prompt
     prompt_text = request.prompt_override or HARVESTER_PROMPT.format(
         page_number=request.page_number,
-        exclude_terms=", ".join(request.exclude_terms[:10])
+        exclude_terms=", ".join(request.exclude_terms[:10]) if request.exclude_terms else "None"
     )
     
     # For vision models, include image
@@ -208,28 +192,45 @@ async def analyze(request: AnalyzeRequest):
     return StreamingResponse(generate(), media_type="text/event-stream")
 
 @app.post("/api/v1/prompts/experiment")
-async def experiment_prompt(
-    prompt: str,
-    image_base64: str,
-    model: Optional[str] = None
-):
+async def experiment_prompt(request: ExperimentRequest):
     """Experiment with custom prompts"""
     llm = get_llm()
-    if model:
-        llm.model_name = model
     
-    messages = [HumanMessage(content=prompt)]
+    if request.provider:
+        global LLM_PROVIDER
+        LLM_PROVIDER = request.provider
+        llm = get_llm()
     
-    if LLM_PROVIDER == "google" and image_base64:
+    if request.model:
+        llm.model_name = request.model
+    
+    if request.temperature:
+        llm.temperature = request.temperature
+    
+    messages = [HumanMessage(content=request.prompt)]
+    
+    if LLM_PROVIDER == "google" and request.image_base64:
         # Handle vision for Google
-        pass
+        messages = [{
+            "role": "user",
+            "parts": [
+                {"text": request.prompt},
+                {
+                    "inline_data": {
+                        "mime_type": "image/png",
+                        "data": request.image_base64.split(",")[1] if "," in request.image_base64 else request.image_base64
+                    }
+                }
+            ]
+        }]
     
     response = await llm.ainvoke(messages)
     return {
-        "prompt": prompt,
+        "prompt": request.prompt,
         "response": response.content if hasattr(response, "content") else str(response),
         "model": llm.model_name,
-        "provider": LLM_PROVIDER
+        "provider": LLM_PROVIDER,
+        "temperature": request.temperature
     }
 
 @app.get("/api/v1/concepts")
