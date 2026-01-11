@@ -521,11 +521,16 @@ CREATE TABLE concepts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
     term VARCHAR(500) NOT NULL,
-    type VARCHAR(100) NOT NULL,  -- date, entity, concept, etc.
+    type VARCHAR(100) NOT NULL,  -- concept, hypernode, entity, date, etc.
+    node_group VARCHAR(50) NOT NULL,  -- concept, hypernode, domain, prior
+    data_type VARCHAR(50),  -- entity, date, location, organization, person, money, legal, condition
+    category VARCHAR(200),
+    explanation TEXT,
     confidence DECIMAL(3,2) NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
     assessment VARCHAR(20) NOT NULL,  -- always_true, usually_true, sometimes_true
-    source_location JSONB,  -- {page, section, x, y}
-    extracted_by VARCHAR(100),  -- Agent name
+    source_location JSONB,  -- {page, section, x, y, boundingBox}
+    ui_group VARCHAR(100),  -- Grouping for UI display (e.g., "Regulations", "Reality Priors")
+    extracted_by VARCHAR(100),  -- Agent name (HARVESTER, ARCHITECT, etc.)
     domain_mapping JSONB,  -- Domain model mapping
     metadata JSONB,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -564,6 +569,8 @@ CREATE TABLE domain_models (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL UNIQUE,  -- microsoft_cdm, accounting, etc.
     version VARCHAR(50),
+    description TEXT,
+    sensitivity VARCHAR(20),  -- LOW, MEDIUM, HIGH
     schema JSONB NOT NULL,  -- Full domain model schema
     metadata JSONB,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -573,7 +580,62 @@ CREATE TABLE domain_models (
 CREATE INDEX idx_domain_models_name ON domain_models(name);
 ```
 
-#### 1.5 Hooks Table
+#### 1.5 Reality Priors Table
+```sql
+CREATE TABLE reality_priors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+    axiom TEXT NOT NULL,  -- The reality prior statement (e.g., "All data centers must comply with GDPR")
+    weight DECIMAL(3,2) DEFAULT 0.9 CHECK (weight >= 0 AND weight <= 1),  -- Confidence/importance weight
+    source VARCHAR(100),  -- Where this prior came from (agent, user, domain model)
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_reality_priors_document_id ON reality_priors(document_id);
+```
+
+#### 1.6 Hypotheses/Claims Table
+```sql
+CREATE TABLE hypotheses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+    target_concept_id UUID REFERENCES concepts(id) ON DELETE CASCADE,
+    claim TEXT NOT NULL,  -- The hypothesis/claim statement
+    evidence TEXT NOT NULL,  -- Supporting evidence for the claim
+    status VARCHAR(20) NOT NULL DEFAULT 'PROPOSED',  -- PROPOSED, ACCEPTED, REJECTED
+    alternative_to UUID REFERENCES hypotheses(id),  -- If this is an alternative hypothesis
+    confidence DECIMAL(3,2) CHECK (confidence >= 0 AND confidence <= 1),
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_hypotheses_document_id ON hypotheses(document_id);
+CREATE INDEX idx_hypotheses_concept_id ON hypotheses(target_concept_id);
+CREATE INDEX idx_hypotheses_status ON hypotheses(status);
+```
+
+#### 1.7 Taxonomies Table
+```sql
+CREATE TABLE taxonomies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+    parent_id UUID REFERENCES concepts(id) ON DELETE CASCADE,  -- Parent concept (e.g., domain)
+    child_id UUID REFERENCES concepts(id) ON DELETE CASCADE,  -- Child concept
+    type VARCHAR(20) NOT NULL,  -- is_a, part_of
+    confidence DECIMAL(3,2) CHECK (confidence >= 0 AND confidence <= 1),
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_taxonomies_parent ON taxonomies(parent_id);
+CREATE INDEX idx_taxonomies_child ON taxonomies(child_id);
+CREATE INDEX idx_taxonomies_type ON taxonomies(type);
+```
+
+#### 1.8 Hooks Table
 ```sql
 CREATE TABLE hooks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -590,7 +652,7 @@ CREATE INDEX idx_hooks_trigger_type ON hooks(trigger_type);
 CREATE INDEX idx_hooks_enabled ON hooks(enabled);
 ```
 
-#### 1.6 Questions Table
+#### 1.9 Questions Table
 ```json
 {
   "id": "uuid",
@@ -625,19 +687,28 @@ CREATE INDEX idx_hooks_enabled ON hooks(enabled);
 ### 2. Neo4j Schema (Graph Data)
 
 #### 2.1 Node Labels
-- `Concept`: Extracted concepts
+- `Concept`: Extracted concepts (type: "concept")
+- `Hypernode`: Context groupings/clusters (type: "hypernode")
+- `Domain`: Domain models (e.g., "Legal Framework", "Financial")
+- `RealityPrior`: Axioms/reality priors (e.g., "All data centers must comply with GDPR")
 - `Document`: Documents
-- `Domain`: Domain models
-- `Taxonomy`: Taxonomy nodes
-- `Entity`: Named entities
+- `Entity`: Named entities (people, organizations, locations, etc.)
+- `Hypothesis`: Claims/hypotheses about concepts
 
 #### 2.2 Relationship Types
-- `RELATES_TO`: General relationship
-- `PART_OF`: Hierarchical relationship
+- `RELATES_TO`: General relationship between concepts
+- `PART_OF`: Hierarchical relationship (part-whole)
+- `IS_A`: Taxonomic relationship (is-a hierarchy)
 - `DEPENDS_ON`: Dependency relationship
 - `SIMILAR_TO`: Similarity relationship
 - `REFERENCES`: Document reference
 - `MATCHES_DOMAIN`: Domain model match
+- `HAS_HYPOTHESIS`: Concept has hypothesis/claim
+- `EVIDENCES`: Hypothesis evidences concept
+- `CONTRADICTS`: Contradictory relationship
+- `STRUCTURAL`: Structural relationship (document structure)
+- `SEMANTIC`: Semantic relationship (meaning-based)
+- `HYPERLINK`: Hyperlink relationship (cross-reference)
 
 #### 2.3 Example Cypher Queries
 
@@ -777,13 +848,20 @@ LIMIT 10
 - ✅ **Real-time updates**: Live graph updates via WebSocket as agents discover concepts
 - ✅ **Force-directed layout**: D3 force simulation with collision detection
 - ✅ **Interactive nodes**: Drag nodes, click to inspect, hover for details
-- ✅ **Node types**: 
-  - Concepts (circles, indigo) - extracted entities/concepts
-  - Hypernodes (squares, orange) - context groupings
-  - Domains/Priors (diamonds, pink) - domain models and reality priors
+- ✅ **Complete node types** (matching prototype):
+  - **Concepts** (circles, indigo) - extracted entities/concepts (type: "concept")
+  - **Hypernodes** (squares, orange) - context groupings/clusters (type: "hypernode")
+  - **Domains** (diamonds, pink) - domain models (e.g., "Legal Framework")
+  - **Reality Priors** (diamonds, pink) - axioms/reality priors (e.g., "All data centers must comply with GDPR")
+- ✅ **Relationship types**:
+  - Structural relationships (dashed lines)
+  - Semantic relationships (solid lines)
+  - Hyperlink relationships (pink lines)
+  - Link labels showing predicates
 - ✅ **Visual effects**: Glow on selection, arrows on edges, link labels
 - ✅ **Live streaming**: Graph updates as agents process documents in real-time
 - ✅ **Node highlighting**: Highlight related nodes on selection
+- ✅ **Hypotheses/Claims**: Display hypotheses linked to concepts
 - ✅ **Responsive**: Auto-resize with container, maintains node positions
 
 **Implementation**:
@@ -833,9 +911,14 @@ export function GraphView({ documentId, onNodeClick }: GraphViewProps) {
 
 **WebSocket Integration**:
 - Subscribe to document-specific updates: `ws://localhost:8001/ws?document_id={id}`
-- Receive real-time events:
-  - `concept_extracted` → Add/update node
-  - `relationship_created` → Add/update edge
+- Receive real-time events (matching prototype AgentPacket protocol):
+  - `concept_extracted` → Add/update concept node (circle, indigo)
+  - `hypernode_created` → Add/update hypernode (square, orange)
+  - `domain_created` → Add/update domain node (diamond, pink)
+  - `prior_created` → Add/update reality prior node (diamond, pink)
+  - `relationship_created` → Add/update edge (with type: structural/semantic/hyperlink)
+  - `taxonomy_created` → Add/update taxonomy relationship (is_a/part_of)
+  - `hypothesis_created` → Add/update hypothesis/claim
   - `progress_update` → Show processing status
 - Graph updates smoothly without full re-render (preserves node positions)
 
@@ -944,15 +1027,25 @@ interface ProgressBarProps {
 - **Components**: D3.js force-directed graph, legend, controls
 - **Features**:
   - **Live updates**: Graph updates in real-time as agents process documents
-  - **Node types**: Concepts (circles), Hypernodes (squares), Domains/Priors (diamonds)
+  - **Complete node types** (matching prototype):
+    - Concepts (circles, indigo) - extracted entities/concepts
+    - Hypernodes (squares, orange) - context groupings
+    - Domains (diamonds, pink) - domain models
+    - Reality Priors (diamonds, pink) - axioms/reality priors
+  - **Relationship types**:
+    - Structural (dashed lines) - document structure relationships
+    - Semantic (solid lines) - meaning-based relationships
+    - Hyperlink (pink lines) - cross-references
+    - Taxonomy (is_a/part_of) - hierarchical relationships
+  - **Hypotheses/Claims**: Display linked to concepts
   - **Interactions**: Drag nodes, click to inspect, zoom/pan, filter by type
   - **Visual effects**: Glow on selection, animated edges, link labels
 - **Real-time**: WebSocket connection for live concept/relationship discovery
 - **Interactions**: 
-  - Click node → Show concept details in side panel
+  - Click node → Show concept details in side panel (including hypotheses)
   - Drag node → Reposition in graph
   - Hover → Show tooltip with concept info
-  - Filter → Show/hide node types
+  - Filter → Show/hide node types (concepts, hypernodes, domains, priors)
 
 #### 3.3 Document Structure View
 - **Layout**: Tree navigation + content view
