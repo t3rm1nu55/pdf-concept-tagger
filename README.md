@@ -41,12 +41,24 @@ See [DEMO_ARCHITECTURE.md](DEMO_ARCHITECTURE.md) for full details.
 
 ## 📚 Documentation
 
-- **[START_HERE.md](START_HERE.md)** - Quick start guide
-- **[PARALLEL_DEVELOPMENT.md](PARALLEL_DEVELOPMENT.md)** - Development coordination
-- **[TASKS.md](TASKS.md)** - Detailed task breakdown
+### Production (Main Branch)
 - **[REQUIREMENTS.md](REQUIREMENTS.md)** - Functional requirements
-- **[DEMO_SETUP.md](DEMO_SETUP.md)** - Setup instructions
-- **[BRANCH_STRATEGY.md](BRANCH_STRATEGY.md)** - Git workflow
+- **[CONTEXT.md](CONTEXT.md)** - Project context
+
+### Development (Develop Branch)
+- **[docs/development/PARALLEL_DEVELOPMENT.md](docs/development/PARALLEL_DEVELOPMENT.md)** - Development coordination
+- **[docs/development/REPO_STRUCTURE.md](docs/development/REPO_STRUCTURE.md)** - Repository structure
+- **[docs/development/BRANCH_STRATEGY.md](docs/development/BRANCH_STRATEGY.md)** - Git workflow
+
+### Track 1: Experimentation (track1-experiment Branch)
+- **[experiment-backend/README.md](experiment-backend/README.md)** - Experiment backend guide
+- **[experiment-backend/QUICK_START.md](experiment-backend/QUICK_START.md)** - Quick start
+
+### Track 2: Demo Machine (track2-demo-machine Branch)
+- **[docs/demo-machine/DEMO_ARCHITECTURE.md](docs/demo-machine/DEMO_ARCHITECTURE.md)** - Architecture design
+- **[docs/demo-machine/DEMO_SETUP.md](docs/demo-machine/DEMO_SETUP.md)** - Setup instructions
+- **[docs/demo-machine/TASKS.md](docs/demo-machine/TASKS.md)** - Task breakdown
+- **[docs/demo-machine/DESIGN_HOOKS.md](docs/demo-machine/DESIGN_HOOKS.md)** - Design hooks reference
 
 ## 🔄 Development Tracks
 
