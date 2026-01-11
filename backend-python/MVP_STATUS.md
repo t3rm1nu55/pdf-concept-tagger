@@ -42,36 +42,45 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configure Cognizant Proxy
+### 2. Start Cognizant LLM Gateway
+
+The gateway must be running before starting the MVP backend.
+
+```bash
+cd /Users/markforster/cognizant-llm-gateway
+python -m clg.server
+```
+
+See `GATEWAY_SETUP.md` for detailed gateway setup.
+
+### 3. Configure Environment
 
 Edit `.env` file:
 ```bash
-COGNIZANT_PROXY_ENDPOINT=https://your-cognizant-proxy.com/api/v1/llm
-COGNIZANT_PROXY_API_KEY=your_api_key_here
-LLM_PROVIDER=openai
+COGNIZANT_LLM_GATEWAY_URL=http://localhost:8080
 LLM_MODEL=gpt-4-turbo-preview
 POSTGRES_URL=postgresql://pdf_tagger:pdf_tagger_dev@localhost:5432/pdf_tagger_mvp
 ```
 
-### 3. Start PostgreSQL
+### 4. Start PostgreSQL
 
 ```bash
 docker-compose -f docker-compose.mvp.yml up -d
 ```
 
-### 4. Run Migrations
+### 5. Run Migrations
 
 ```bash
 alembic upgrade head
 ```
 
-### 5. Start Server
+### 6. Start Server
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 6. Test API
+### 7. Test API
 
 ```bash
 # Health check
