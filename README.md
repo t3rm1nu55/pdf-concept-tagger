@@ -2,75 +2,131 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# PDF Concept Tagger
 
-This contains everything you need to run your app locally.
+A regulatory analysis tool that ingests PDFs, performs AI-powered analysis, and constructs a live knowledge graph of concepts, relationships, and hypotheses using a **multi-agent backend architecture**.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1YedlEMdBJs7q_5w9PubERhrarZIzm7Sz
+## Architecture
 
-## Run Locally
+The system uses **separate agent processes** running on a Node.js backend:
+- **HARVESTER**: Extracts concepts from PDF pages
+- **ARCHITECT**: Defines domains and creates semantic relationships  
+- **CURATOR**: Organizes taxonomical hierarchies
+- **CRITIC**: Evaluates graph quality (TODO)
+- **OBSERVER**: Monitors system state (TODO)
 
-**Prerequisites:**  Node.js
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 
-### Option 1: Using Proxy API (Recommended)
+## Quick Start
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
-2. Deploy the proxy server (see [PROXY_DEPLOYMENT.md](PROXY_DEPLOYMENT.md)):
-   ```bash
-   # Example: Run the example proxy server
-   GEMINI_API_KEY=your_key_here node proxy-server-example.js
-   ```
+### 1. Start Backend Services
 
-3. Configure the frontend to use the proxy:
-   - Create `.env.local` file:
-     ```
-     PROXY_API_ENDPOINT=http://localhost:3000/api/v1/analyze
-     ```
-   - Or set in `index.html` before app loads:
-     ```html
-     <script>
-       window.__PROXY_CONFIG__ = {
-         endpoint: 'http://localhost:3000/api/v1/analyze'
-       };
-     </script>
-     ```
+```bash
+# Install backend dependencies
+cd backend
+npm install
 
-4. Run the app:
-   ```bash
-   npm run dev
-   ```
+# Configure environment (create .env file)
+cp .env.example .env
+# Edit .env and set GEMINI_API_KEY
 
-### Option 2: Direct API (Legacy)
+# Start coordinator (manages all agents)
+npm run dev
+```
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+The backend will start on:
+- API Server: http://localhost:4000
+- WebSocket Server: ws://localhost:4001
 
-2. Set the `API_KEY` in `.env.local` to your Gemini API key:
-   ```
-   API_KEY=your_gemini_api_key_here
-   ```
+### 2. Start Frontend
 
-3. Run the app:
-   ```bash
-   npm run dev
-   ```
+```bash
+# In project root
+npm install
+npm run dev
+```
+
+The frontend will connect to the backend automatically.
+
+### Production Deployment (Separate Processes)
+
+For production, run agents as separate processes:
+
+```bash
+# Terminal 1: Coordinator
+npm run coordinator
+
+# Terminal 2: Harvester Agent
+npm run agent:harvester
+
+# Terminal 3: Architect Agent  
+npm run agent:architect
+
+# Terminal 4: Curator Agent
+npm run agent:curator
+```
 
 ## Features
 
-- **Proxy API Integration**: Secure API key management via proxy server
-- **Agent Coordination**: Robust agent coordination framework (ADK/A2A patterns)
+- **Multi-Agent Architecture**: Separate processes for each agent role
+- **Message Bus Communication**: Agents communicate via message bus (memory/Redis)
+- **Real-Time Updates**: WebSocket support for live agent updates
 - **Streaming Analysis**: Real-time PDF analysis with streaming responses
 - **Knowledge Graph**: Interactive D3.js visualization of extracted concepts
 - **Persistence**: IndexedDB storage for concepts, relationships, and hypotheses
 
+## Project Structure
+
+```
+├── backend/                 # Backend services
+│   ├── src/
+│   │   ├── agents/         # Individual agent processes
+│   │   │   ├── harvester.js
+│   │   │   ├── architect.js
+│   │   │   └── curator.js
+│   │   ├── shared/        # Shared utilities
+│   │   │   ├── agent-base.js
+│   │   │   ├── message-bus.js
+│   │   │   └── types.js
+│   │   └── coordinator.js # Main orchestrator
+│   └── package.json
+├── src/                    # Frontend (Angular)
+│   ├── services/
+│   │   └── backend-api.service.ts
+│   └── components/
+└── README.md
+```
+
 ## Documentation
 
+- [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and design
 - [REQUIREMENTS.md](REQUIREMENTS.md) - Requirements for prototype to demo transition
 - [PROXY_DEPLOYMENT.md](PROXY_DEPLOYMENT.md) - Proxy API deployment guide
-- [CONTEXT.md](CONTEXT.md) - Project context and architecture
+- [CONTEXT.md](CONTEXT.md) - Project context and history
+- [backend/README.md](backend/README.md) - Backend-specific documentation
+
+## Development
+
+### Adding a New Agent
+
+1. Create `backend/src/agents/your-agent.js`
+2. Extend `BaseAgent` class
+3. Implement agent-specific logic
+4. Register in `coordinator.js`
+5. Add npm script in `backend/package.json`
+
+### Message Bus
+
+Agents communicate via `AgentPacket` messages. Supported transports:
+- **memory**: In-process (default, single server)
+- **redis**: Distributed (multiple servers)
+
+See [backend/README.md](backend/README.md) for details.
+
+## License
+
+MIT
