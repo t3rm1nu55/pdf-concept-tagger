@@ -1,0 +1,36 @@
+# MVP Requirements - Minimal dependencies for MVP functionality
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+websockets==12.0
+
+# Data Validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Database
+psycopg2-binary==2.9.9  # PostgreSQL
+
+# PDF Processing
+pdfplumber==0.10.3
+
+# HTTP Client
+httpx==0.26.0
+
+# Utilities
+python-dotenv==1.0.0
+aiofiles==23.2.1
+
+# Database Migrations
+alembic==1.13.1
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+
+# Code Quality (optional)
+ruff==0.1.11
+black==24.1.1
+mypy==1.8.0

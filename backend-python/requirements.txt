@@ -8,19 +8,21 @@ python-multipart==0.0.6
 websockets==12.0
 
 # LangChain & Agents
-langchain==0.1.0
-langchain-openai==0.0.2
-langchain-anthropic==0.1.0
-langchain-google-genai==0.0.6
-langgraph==0.0.20
-langsmith==0.1.0  # Optional: monitoring
+# Note: These are for future full demo - not required for MVP
+# langchain==0.1.0
+# langchain-openai==0.0.2
+# langchain-anthropic==0.1.0
+# langchain-google-genai==0.0.6
+# langgraph==0.0.20
+# langsmith==0.1.0  # Optional: monitoring
 
 # LlamaIndex (RAG, Knowledge Graph, Query Engines)
-llama-index-core==0.10.0
-llama-index-vector-stores-pinecone==0.1.0
-llama-index-graph-stores-neo4j==0.1.0
-llama-index-embeddings-openai==0.1.0
-llama-index-llms-openai==0.1.0
+# Note: These are for future full demo - not required for MVP
+# llama-index-core==0.10.0
+# llama-index-vector-stores-pinecone==0.1.2
+# llama-index-graph-stores-neo4j==0.1.0
+# llama-index-embeddings-openai==0.1.0
+# llama-index-llms-openai==0.1.0
 
 # Data Validation
 pydantic==2.5.3
@@ -28,10 +30,11 @@ pydantic-settings==2.1.0
 
 # Databases
 psycopg2-binary==2.9.9  # PostgreSQL
-neo4j==5.15.0  # Neo4j
-pinecone-client==3.0.0  # Pinecone
-redis==5.0.1  # Redis
-elasticsearch==8.11.0  # Elasticsearch
+# Note: These are for future full demo - not required for MVP
+# neo4j==5.15.0  # Neo4j
+# pinecone-client==3.0.0  # Pinecone
+# redis==5.0.1  # Redis
+# elasticsearch==8.11.0  # Elasticsearch
 
 # PDF Processing
 docling==1.0.0  # Preferred
