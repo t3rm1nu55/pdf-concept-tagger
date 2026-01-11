@@ -10,16 +10,16 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to understand the complete structure of documents so that I can navigate and understand relationships between sections.**
 
 **Requirements:**
-- Extract and represent the hierarchical structure of documents (pages, sections, subsections, chapters)
+- Extract and represent the hierarchical structure of documents (pages, sections, subsections, chapters) *(🔧 Design Hook: Define data model for document structure during MVP1 data modeling)*
 - Identify and map links between sections within a document
-- Handle multi-document structures - identify relationships and references between different documents
-- Preserve document metadata (creation date, author, version, document type)
-- Support document versioning and track changes across versions
+- Handle multi-document structures - identify relationships and references between different documents *(🔧 Design Hook: Design multi-document data model and relationships during MVP1 data modeling)*
+- Preserve document metadata (creation date, author, version, document type) *(🔧 Design Hook: Define metadata schema during MVP1 data modeling)*
+- Support document versioning and track changes across versions *(📋 MVP Demo: Basic versioning; v1.0: Full change tracking)*
 
 **Success Criteria:**
 - System can reconstruct document outline/navigation automatically
 - Cross-document references are identified and linked
-- Document structure is queryable (e.g., "show all sections that reference Section 3.2")
+- Document structure is queryable (e.g., "show all sections that reference Section 3.2") *(🔧 Design Hook: Design query API/syntax during MVP1 API design)*
 - Multi-document collections maintain structural integrity
 
 ### Outcome 1.2: Document Relationship Mapping
@@ -69,8 +69,8 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Success Criteria:**
 - Confidence scores accurately reflect information certainty
 - System distinguishes between explicit and inferred information
-- Uncertainty markers are clearly identified and explained
-- Users can filter by confidence level (e.g., "show only high-confidence entities")
+- Uncertainty markers are clearly identified and explained *(🔧 Design Hook: Design UI components for uncertainty visualization during MVP1 UX design)*
+- Users can filter by confidence level (e.g., "show only high-confidence entities") *(🔧 Design Hook: Design filter UI component during MVP1 UX design - common component candidate)*
 
 **Example Scenarios:**
 - "The date of completion of sale is X" → High confidence, explicit statement
@@ -84,7 +84,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need the system to recognize when documents match known domain models so that it can extract structured information automatically.**
 
 **Requirements:**
-- Use machine learning to match document content with known schema/domain models
+- Use machine learning to match document content with known schema/domain models *(📋 MVP Demo: Rule-based matching; v1.0: ML-based matching)*
 - Support multiple domain models: could include *(🔧 Design Hook: Refine domain model list and import scope during MVP1 analysis)*
   - **Microsoft Common Data Model (CDM)**: When CRM, project management, or task management concepts are detected
   - **Accounting/Financial**: GAAP, IFRS, financial reporting standards
@@ -100,8 +100,8 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Success Criteria:**
 - System correctly identifies domain model matches (>85% accuracy)
 - Upon detection, system actively seeks domain-specific information
-- Extracted data conforms to domain model schemas
-- Users can see which domain model(s) apply to their documents
+- Extracted data conforms to domain model schemas *(🔧 Design Hook: Design schema mapping/transformation API during MVP1 API design)*
+- Users can see which domain model(s) apply to their documents *(🔧 Design Hook: Design UI component for domain model display during MVP1 UX design)*
 
 **Example Workflow:**
 1. Document mentions "client relationship management", "project management", "task management"
@@ -114,10 +114,10 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need the system to recognize common patterns even without exact domain model matches so that extraction is still effective.**
 
 **Requirements:**
-- Maintain a library of generic schemas and patterns
+- Maintain a library of generic schemas and patterns *(🔧 Design Hook: Design schema library data model and API during MVP1 data modeling)*
 - Match concepts to generic patterns (e.g., "date fields", "monetary amounts", "party relationships")
-- Provide "likely hit list" for generic concepts
-- Allow users to define custom domain models
+- Provide "likely hit list" for generic concepts *(🔧 Design Hook: Design UI component for hit list display during MVP1 UX design - common component candidate)*
+- Allow users to define custom domain models *(📋 MVP Demo: Predefined models only; v1.0: Custom model creation)*
 
 **Success Criteria:**
 - Generic patterns cover 80%+ of common document types
@@ -130,7 +130,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As an agent, I need automatic task activation based on discoveries so that I can work efficiently without manual configuration.**
 
 **Requirements:**
-- Implement hook system: when agent discovers X, automatically activate Y tasks
+- Implement hook system: when agent discovers X, automatically activate Y tasks *(🔧 Design Hook: Design hook system API and event architecture during MVP1 API design)*
 - Example hooks: could include *(🔧 Design Hook: Refine hook types and activation rules during MVP1 analysis)*
   - **If date discovered** → Activate date store tasks (normalization, temporal modeling, date relationship analysis)
   - **If legal concepts discovered** → Activate legal domain tasks (legal entity extraction, regulation mapping, compliance checking)
@@ -143,7 +143,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Agents automatically activate relevant tasks when discoveries are made
 - Hook system reduces manual configuration by 80%+
 - Domain models are automatically imported when relevant concepts detected
-- Hook triggers are logged and traceable
+- Hook triggers are logged and traceable *(🔧 Design Hook: Design logging/audit data model and UI during MVP1 data modeling and UX design)*
 
 **Example Workflow:**
 1. HARVESTER discovers date "2024-06-30" in document
@@ -180,11 +180,11 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to understand the reliability of extracted information so that I can make informed decisions about what to trust.**
 
 **Requirements:**
-- Implement assessment indicators with three levels:
+- Implement assessment indicators with three levels: *(🔧 Design Hook: Design assessment indicator data model and UI representation during MVP1 data modeling and UX design - common component candidate)*
   - **Always True**: High confidence, explicit statements (e.g., "dates into date store" - dates are factual)
   - **Usually True**: Medium confidence, likely but not certain (e.g., "dates indicate temporal model" - dates probably relate to timeline)
   - **Sometimes True**: Low confidence, conditional/uncertain (e.g., "dates are indicative/aspirational/planned/expected/met/missed")
-- Use assessment indicators to conditionally activate components:
+- Use assessment indicators to conditionally activate components: *(🔧 Design Hook: Design conditional activation API/workflow during MVP1 API design)*
   - **Always True** → Activate component immediately, full processing
   - **Usually True** → Activate component with validation checks
   - **Sometimes True** → Activate component with user confirmation or additional analysis
@@ -198,7 +198,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 - Assessment indicators accurately reflect information reliability (>85% accuracy)
 - Components activate conditionally based on assessment
 - System doesn't waste resources on low-confidence data
-- Users can see assessment reasoning for each extraction
+- Users can see assessment reasoning for each extraction *(🔧 Design Hook: Design explanation UI component during MVP1 UX design - common component candidate)*
 
 **Example:**
 - Date "2024-06-30" found with text "Proposed completion date: 2024-06-30"
@@ -241,7 +241,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need the system to automatically generate relevant questions about the document so that I can discover important information.**
 
 **Requirements:**
-- Create local question banks (document-specific questions)
+- Create local question banks (document-specific questions) *(🔧 Design Hook: Design question bank data model during MVP1 data modeling)*
 - Create wider question banks (domain-specific, general questions)
 - Tag questions by: could include *(🔧 Design Hook: Refine question tagging taxonomy during MVP1 analysis)*
   - Document section
@@ -255,26 +255,26 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Success Criteria:**
 - System generates 10+ relevant questions per document section
 - Questions adapt as more information is discovered
-- Questions are prioritized by importance and answerability
-- Users can see question-answer pairs for document understanding
+- Questions are prioritized by importance and answerability *(🔧 Design Hook: Design prioritization algorithm and UI during MVP1 UX design)*
+- Users can see question-answer pairs for document understanding *(🔧 Design Hook: Design Q&A UI component during MVP1 UX design - common component candidate)*
 - Questions are automatically generated based on hook activations
 
 ### Outcome 5.2: Automatic Contextual Answering
 **As a user, I need the system to automatically answer questions when information becomes available so that I don't have to manually search.**
 
 **Requirements:**
-- Auto-answer questions when relevant information is discovered
-- Provide context for answers (where in document, confidence level, assessment indicator)
+- Auto-answer questions when relevant information is discovered *(🔧 Design Hook: Design auto-answering API and algorithm during MVP1 API design)*
+- Provide context for answers (where in document, confidence level, assessment indicator) *(🔧 Design Hook: Design answer context data model and UI during MVP1 data modeling and UX design)*
 - Handle temporal questions: "What does date in this location relate to?"
 - Create full temporal model for documents (timeline of events, dates, deadlines)
-- Answer questions using discovered information + domain models + prior knowledge
+- Answer questions using discovered information + domain models + prior knowledge *(🔧 Design Hook: Design knowledge integration API during MVP1 API design)*
 - Use assessment indicators to qualify answers (e.g., "This date is aspirational, so the answer is tentative")
 
 **Success Criteria:**
 - System answers 70%+ of generated questions automatically
-- Answers include source citations, confidence levels, and assessment indicators
+- Answers include source citations, confidence levels, and assessment indicators *(🔧 Design Hook: Design citation UI component during MVP1 UX design - common component candidate)*
 - Temporal questions are answered with complete context
-- Users can see which questions remain unanswered and why
+- Users can see which questions remain unanswered and why *(🔧 Design Hook: Design unanswered question UI component during MVP1 UX design)*
 - Answers reflect assessment indicators (always/usually/sometimes true)
 
 **Example:**
@@ -289,7 +289,7 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to understand when things happened or will happen in documents so that I can track timelines and deadlines.**
 
 **Requirements:**
-- Extract all temporal information (dates, deadlines, milestones, durations)
+- Extract all temporal information (dates, deadlines, milestones, durations) *(🔧 Design Hook: Design temporal data model during MVP1 data modeling)*
 - Create complete temporal model for each document: could include *(🔧 Design Hook: Refine temporal model components during MVP1 analysis)*
   - Event timeline
   - Date relationships (before, after, during)
@@ -301,8 +301,8 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **Success Criteria:**
 - All dates in documents are extracted and modeled
 - Temporal relationships are correctly identified
-- Timeline visualization is accurate and navigable
-- Temporal conflicts are flagged for user attention
+- Timeline visualization is accurate and navigable *(🔧 Design Hook: Design timeline visualization UI component during MVP1 UX design - common component candidate)*
+- Temporal conflicts are flagged for user attention *(🔧 Design Hook: Design conflict notification UI component during MVP1 UX design)*
 
 ### Outcome 5.2: Completion Date Tracking and Validation
 **As a user, I need to track actual vs. planned completion dates so that I can identify delays and discrepancies.**
@@ -358,9 +358,9 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to query data regardless of how it's stored so that I can find information efficiently.**
 
 **Requirements:**
-- Provide unified query interface that works across all representations
-- Automatically route queries to appropriate storage format
-- Support complex queries spanning multiple representations
+- Provide unified query interface that works across all representations *(🔧 Design Hook: Design query API/syntax during MVP1 API design)*
+- Automatically route queries to appropriate storage format *(🔧 Design Hook: Design query routing algorithm during MVP1 API design)*
+- Support complex queries spanning multiple representations *(📋 MVP Demo: Single-representation queries; v1.0: Cross-representation queries)*
 - Optimize query performance based on representation type
 
 **Success Criteria:**
@@ -375,25 +375,25 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to see how concepts relate across multiple documents so that I can understand the complete picture.**
 
 **Requirements:**
-- Link identical concepts across documents
-- Identify concept variations (synonyms, abbreviations)
-- Track concept evolution across document versions
-- Build unified concept graph spanning all documents
+- Link identical concepts across documents *(🔧 Design Hook: Design concept linking algorithm and data model during MVP1 data modeling)*
+- Identify concept variations (synonyms, abbreviations) *(🔧 Design Hook: Design variation detection algorithm during MVP1 API design)*
+- Track concept evolution across document versions *(📋 MVP Demo: Basic version tracking; v1.0: Full evolution tracking)*
+- Build unified concept graph spanning all documents *(🔧 Design Hook: Design cross-document graph data model during MVP1 data modeling)*
 
 **Success Criteria:**
 - Concepts are linked across documents automatically
 - Concept variations are identified and linked
-- Users can see concept usage across document collection
+- Users can see concept usage across document collection *(🔧 Design Hook: Design concept usage UI component during MVP1 UX design)*
 - Concept graph spans entire document corpus
 
 ### Outcome 7.2: Document Collection Insights
 **As a user, I need insights about my entire document collection so that I can understand patterns and relationships.**
 
 **Requirements:**
-- Identify common concepts across document collection
-- Detect document clusters (related documents)
-- Find document gaps (missing information, incomplete sets)
-- Generate collection-level summaries and insights
+- Identify common concepts across document collection *(🔧 Design Hook: Design collection analysis API during MVP1 API design)*
+- Detect document clusters (related documents) *(🔧 Design Hook: Design clustering algorithm during MVP1 API design)*
+- Find document gaps (missing information, incomplete sets) *(📋 MVP Demo: Basic gap detection; v1.0: Advanced gap analysis)*
+- Generate collection-level summaries and insights *(🔧 Design Hook: Design summary generation API and UI during MVP1 API design and UX design)*
 
 **Success Criteria:**
 - System identifies document clusters automatically
@@ -407,11 +407,11 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need confidence that extracted information is accurate and complete so that I can rely on it for decision-making.**
 
 **Requirements:**
-- Validate extracted data against domain models
+- Validate extracted data against domain models *(🔧 Design Hook: Design validation API and workflow during MVP1 API design)*
 - Check for consistency across documents
-- Identify contradictions or conflicts
-- Provide data quality scores
-- Flag low-confidence extractions for review
+- Identify contradictions or conflicts *(🔧 Design Hook: Design conflict detection algorithm and UI during MVP1 API design and UX design)*
+- Provide data quality scores *(🔧 Design Hook: Design quality scoring algorithm and UI during MVP1 API design and UX design - common component candidate)*
+- Flag low-confidence extractions for review *(🔧 Design Hook: Design review workflow UI during MVP1 UX design)*
 
 **Success Criteria:**
 - Data quality scores are provided for all extractions
@@ -423,8 +423,8 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need the system to learn from corrections so that it improves over time.**
 
 **Requirements:**
-- Allow users to correct extractions
-- Learn from corrections to improve future extractions
+- Allow users to correct extractions *(🔧 Design Hook: Design correction UI and API during MVP1 UX design and API design)*
+- Learn from corrections to improve future extractions *(🔧 Design Hook: Design learning algorithm and feedback loop during MVP1 API design)*
 - Adapt domain model matching based on user feedback
 - Improve confidence scoring based on validation results
 
@@ -440,9 +440,9 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to navigate documents and concepts intuitively so that I can find information quickly.**
 
 **Requirements:**
-- Visual document structure navigation
-- Interactive concept graph exploration
-- Search across all representations
+- Visual document structure navigation *(🔧 Design Hook: Design document structure navigation UI component during MVP1 UX design - common component candidate)*
+- Interactive concept graph exploration *(🔧 Design Hook: Design graph exploration UI component during MVP1 UX design - common component candidate)*
+- Search across all representations *(🔧 Design Hook: Design search UI component and API during MVP1 UX design and API design - common component candidate)*
 - Could include navigation features: *(🔧 Design Hook: Refine navigation features during MVP1 UX design)*
   - Filter and facet search results
   - Breadcrumb navigation for complex queries
@@ -491,10 +491,10 @@ This document defines the functional requirements for PDF Concept Tagger as **ou
 **As a user, I need to see discoveries as they happen so that I can monitor progress.**
 
 **Requirements:**
-- Stream extraction results in real-time
-- Update UI as discoveries are made
-- Show processing progress
-- Support cancellation of long-running processes
+- Stream extraction results in real-time *(🔧 Design Hook: Design streaming API (WebSocket/SSE) during MVP1 API design)*
+- Update UI as discoveries are made *(🔧 Design Hook: Design real-time update UI components during MVP1 UX design - common component candidate)*
+- Show processing progress *(🔧 Design Hook: Design progress indicator UI component during MVP1 UX design - common component candidate)*
+- Support cancellation of long-running processes *(🔧 Design Hook: Design cancellation API and UI during MVP1 API design and UX design)*
 
 **Success Criteria:**
 - Results stream within 1 second of discovery
