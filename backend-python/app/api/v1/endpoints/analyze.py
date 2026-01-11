@@ -124,8 +124,6 @@ async def process_text_extraction(
         await send_concept_update(document_id, concept)
     
     db.commit()
-    
-    return stored_concepts
 
 
 @router.post("/analyze")
