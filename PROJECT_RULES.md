@@ -574,11 +574,12 @@ git diff --cached         # Review staged changes
 
 ### Cursor 2.0 Integration
 
-**Built-in Features** (don't duplicate):
-- ✅ **Semantic Search**: Composer model has optimized codebase-wide semantic search
-- ✅ **Code Review**: Enhanced review interface for multi-file changes
-- ✅ **Multi-Agent**: Can run up to 8 agents in parallel
-- ✅ **Sandboxed Terminals**: Secure command execution
+**Built-in Features** (verified from official docs - don't duplicate):
+- ✅ **Semantic Search**: Composer model has optimized codebase-wide semantic search ([Cursor Blog](https://cursor.com/blog/2-0/))
+- ✅ **Code Review**: Enhanced review interface for multi-file changes ([Changelog](https://cursor.com/changelog/2-0/))
+- ✅ **Multi-Agent**: Interface for managing multiple agents in parallel ([Changelog](https://cursor.com/changelog/2-0/))
+- ✅ **Team Commands**: Centralized custom commands and rules ([Changelog](https://cursor.com/changelog/2-0/))
+- ✅ **ESLint Integration**: AI-powered lint fixing ([Docs](https://docs.cursor.com/en/guides/languages/javascript))
 
 **This Project Adds**:
 - ✅ Pre-commit hooks (automated quality checks)

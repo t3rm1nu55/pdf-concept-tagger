@@ -1,6 +1,8 @@
 # Cursor IDE Rules for PDF Concept Tagger
 
 > **Note**: Cursor 2.0 has built-in semantic search (Composer model) - this file supplements, not replaces, those optimizations.
+> 
+> **Note**: Cursor 2.0 officially supports Team Commands for shared rules. This `.cursorrules` file provides project-level context that Cursor's AI can read.
 
 ## Project Rules Reference
 

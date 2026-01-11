@@ -20,15 +20,22 @@ This project is optimized for **Cursor 2.0** with its built-in semantic search a
 **✅ Supplement**: Use [CODE_QUALITY_CHECKLIST.md](CODE_QUALITY_CHECKLIST.md) for project-specific standards
 
 ### 3. Multi-Agent Interface
-**Cursor 2.0** can run up to 8 agents in parallel, each in isolated codebase copies.
+**Cursor 2.0** supports running multiple agents in parallel, each operating in isolated codebase copies.
 
+**✅ Confirmed**: Multi-agent interface with sidebar for agents and plans  
 **✅ Use**: Cursor's multi-agent interface for parallel development  
 **✅ Align**: With our parallel tracks (Track 1: Experiment, Track 2: Demo Machine)
 
-### 4. Sandboxed Terminals
-**Cursor 2.0** provides sandboxed terminals for secure command execution.
+**Source**: [Cursor 2.0 Changelog](https://cursor.com/changelog/2-0/)
 
-**✅ Use**: Cursor's sandboxed terminals for testing and development
+### 4. Team Commands & Custom Rules
+**Cursor 2.0** supports Team Commands, allowing teams to define and share custom commands and rules centrally.
+
+**✅ Confirmed**: Team Commands feature for project-specific guidelines  
+**✅ Use**: `.cursorrules` file provides project context (if supported)  
+**✅ Alternative**: Use Team Commands for team-wide rules
+
+**Source**: [Cursor 2.0 Changelog](https://cursor.com/changelog/2-0/)
 
 ## Project-Specific Setup
 
@@ -60,6 +67,8 @@ pre-commit install
 - References PROJECT_RULES.md
 - Provides quick context for Cursor's AI
 - Supplements (not replaces) Cursor's built-in features
+
+**Note**: While `.cursorrules` is a common convention, Cursor 2.0 officially supports **Team Commands** for shared rules. The `.cursorrules` file serves as project-level context that Cursor's AI can read.
 
 ### 3. CODE_QUALITY_CHECKLIST.md
 
@@ -107,10 +116,10 @@ pre-commit install
 ## What NOT to Duplicate
 
 **Don't add**:
-- ❌ Custom semantic search (Cursor's is optimized)
-- ❌ Custom code review UI (Cursor's is built-in)
-- ❌ Custom multi-agent system (Cursor's is native)
-- ❌ Custom terminal sandboxing (Cursor's is secure)
+- ❌ Custom semantic search (Cursor's Composer model is optimized)
+- ❌ Custom code review UI (Cursor's enhanced review interface is built-in)
+- ❌ Custom multi-agent system (Cursor's multi-agent interface is native)
+- ❌ Redundant quality checks (Cursor's ESLint integration handles many checks)
 
 **Do add**:
 - ✅ Project-specific rules (`.cursorrules`)
@@ -128,21 +137,41 @@ pre-commit install
 
 ## Summary
 
-**Cursor 2.0 Provides**:
-- ✅ Optimized semantic search (Composer model)
-- ✅ Enhanced code review interface
-- ✅ Multi-agent parallel development
-- ✅ Sandboxed terminals
+**Cursor 2.0 Provides** (Confirmed from Official Docs):
+- ✅ **Semantic Search**: Composer model with codebase-wide semantic search ([Cursor Blog](https://cursor.com/blog/2-0/))
+- ✅ **Code Review**: Enhanced interface for viewing changes across multiple files ([Changelog](https://cursor.com/changelog/2-0/))
+- ✅ **Multi-Agent**: Interface for managing multiple agents in parallel ([Changelog](https://cursor.com/changelog/2-0/))
+- ✅ **Team Commands**: Centralized custom commands and rules ([Changelog](https://cursor.com/changelog/2-0/))
+- ✅ **ESLint Integration**: AI-powered lint fixing capabilities ([Docs](https://docs.cursor.com/en/guides/languages/javascript))
 
-**This Project Adds**:
-- ✅ Project-specific rules (`.cursorrules`)
-- ✅ Quality checklists (supplements)
-- ✅ Pre-commit hooks (optional automation)
+**This Project Adds** (Supplements, Not Replacements):
+- ✅ Project-specific rules (`.cursorrules` - project context)
+- ✅ Quality checklists (supplements Cursor's review)
+- ✅ Pre-commit hooks (optional automation - Cursor has built-in review)
 - ✅ Documentation (PROJECT_RULES.md, etc.)
 
 **Key Principle**: Leverage Cursor's optimizations, supplement with project-specific standards.
 
+## Official Documentation References
+
+- **Cursor 2.0 Blog**: https://cursor.com/blog/2-0/
+- **Cursor 2.0 Changelog**: https://cursor.com/changelog/2-0/
+- **Cursor Docs**: https://docs.cursor.com/
+
+## Verification Status
+
+✅ **Verified Features** (from official docs):
+- Semantic search (Composer model)
+- Enhanced code review interface
+- Multi-agent interface
+- Team Commands for shared rules
+- ESLint integration
+
+⚠️ **Assumed/Conventional**:
+- `.cursorrules` file (common convention, not explicitly documented)
+- Sandboxed terminals (mentioned in some contexts, not explicitly confirmed)
+
 ---
 
 **Last Updated**: 2026-01-11  
-**Status**: ✅ Optimized for Cursor 2.0
+**Status**: ✅ Optimized for Cursor 2.0 (verified against official docs)
