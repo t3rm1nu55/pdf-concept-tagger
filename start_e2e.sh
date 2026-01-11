@@ -60,11 +60,22 @@ echo ""
 echo "2️⃣  Running database migrations..."
 if [ -d "venv" ]; then
     source venv/bin/activate
-    alembic upgrade head
-    echo -e "${GREEN}   ✅ Migrations complete${NC}"
+    if alembic upgrade head; then
+        echo -e "${GREEN}   ✅ Migrations complete${NC}"
+    else
+        echo -e "${RED}   ❌ Migrations failed!${NC}"
+        echo "      Check the error above and fix before continuing."
+        exit 1
+    fi
 else
-    echo -e "${YELLOW}   ⚠️  Virtual environment not found. Run setup first:${NC}"
+    echo -e "${RED}   ❌ Virtual environment not found!${NC}"
+    echo ""
+    echo "      Migrations CANNOT run without the virtual environment."
+    echo "      Run setup first:"
     echo "      cd backend-python && ./setup_mvp.sh"
+    echo ""
+    echo -e "${RED}   Exiting - migrations are required for the system to work.${NC}"
+    exit 1
 fi
 
 # 3. Check gateway

@@ -15,11 +15,13 @@
 ```
 
 This will:
-1. ✅ Check prerequisites
-2. ✅ Start PostgreSQL
-3. ✅ Run database migrations
+1. ✅ Check prerequisites (Python, Docker)
+2. ✅ Start PostgreSQL (if Docker is running)
+3. ✅ Run database migrations (exits with error if venv missing)
 4. ✅ Check gateway status
 5. ✅ Show you how to start backend and frontend
+
+**Note**: If the virtual environment doesn't exist, the script will exit with an error. Run `cd backend-python && ./setup_mvp.sh` first to create it.
 
 ## Manual Start (3 Terminals)
 
