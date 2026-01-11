@@ -76,7 +76,6 @@ async def process_text_extraction(
     ]
     
     # Store concepts and send AgentPacket updates
-    stored_concepts = []
     for concept_data in filtered_concepts:
         concept = Concept(
             document_id=document_id,
@@ -94,7 +93,6 @@ async def process_text_extraction(
         )
         db.add(concept)
         db.flush()  # Flush to get concept ID
-        stored_concepts.append(concept)
         
         # Create AgentPacket for concept
         concept_packet = AgentPacket(
@@ -207,7 +205,6 @@ async def analyze_pdf(
                         return
                     
                     # Process text extraction
-                    stored_concepts = []
                     async for packet in process_text_extraction(
                         text,
                         document_id,
@@ -216,7 +213,6 @@ async def analyze_pdf(
                         request.excludeTerms
                     ):
                         yield packet
-                        # Extract stored_concepts from packets if needed
                     
                 except Exception as e:
                     logger.error(f"Error processing image: {e}", exc_info=True)
@@ -283,7 +279,6 @@ async def analyze_pdf(
                     return
                 
                 # 5. Process text extraction
-                stored_concepts = []
                 async for packet in process_text_extraction(
                     page_text,
                     document_id,
