@@ -60,3 +60,53 @@ class Relationship(Base):
     strength = Column(Float)
     relationship_metadata = Column(JSON)  # Renamed from 'metadata' (reserved in SQLAlchemy)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Domain(Base):
+    """Domain model - hub nodes created by ARCHITECT agent."""
+    __tablename__ = "domains"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    sensitivity = Column(String(20), default="MEDIUM")  # LOW, MEDIUM, HIGH
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class Taxonomy(Base):
+    """Taxonomy model - hierarchical links created by CURATOR agent."""
+    __tablename__ = "taxonomies"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False)
+    parent_concept_id = Column(UUID(as_uuid=True), ForeignKey("concepts.id"), nullable=False)
+    child_concept_id = Column(UUID(as_uuid=True), ForeignKey("concepts.id"), nullable=False)
+    type = Column(String(50), nullable=False)  # is_a, part_of
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Hypothesis(Base):
+    """Hypothesis model - claims with evidence created by CRITIC agent."""
+    __tablename__ = "hypotheses"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False)
+    target_concept_id = Column(UUID(as_uuid=True), ForeignKey("concepts.id"), nullable=False)
+    claim = Column(Text, nullable=False)
+    evidence = Column(Text, nullable=False)
+    status = Column(String(20), default="PROPOSED")  # PROPOSED, ACCEPTED, REJECTED
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class Prior(Base):
+    """Prior model - reality priors/axioms (context knowledge)."""
+    __tablename__ = "priors"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=True)  # Can be global
+    axiom = Column(Text, nullable=False)
+    weight = Column(Float, default=1.0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

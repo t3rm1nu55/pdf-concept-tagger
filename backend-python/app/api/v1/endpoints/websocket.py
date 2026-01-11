@@ -12,6 +12,7 @@ import uuid
 
 from app.database.postgres import get_db
 from app.models.concept import Concept, Relationship
+from app.models.agent_packet import AgentPacket, AgentPacketContent, ConceptContent
 
 router = APIRouter()
 
@@ -92,17 +93,28 @@ async def websocket_endpoint(websocket: WebSocket, document_id: uuid.UUID):
 
 
 async def send_concept_update(document_id: uuid.UUID, concept: Concept):
-    """Send concept update via WebSocket."""
-    await manager.broadcast_to_document({
-        "type": "concept_extracted",
-        "data": {
-            "concept_id": str(concept.id),
-            "term": concept.term,
-            "type": concept.type,
-            "confidence": concept.confidence,
-            "assessment": concept.assessment
-        }
-    }, document_id)
+    """Send concept update via WebSocket in AgentPacket format."""
+    packet = AgentPacket(
+        sender="HARVESTER",
+        recipient="",
+        intent="GRAPH_UPDATE",
+        content=AgentPacketContent(
+            concept=ConceptContent(
+                id=str(concept.id),
+                term=concept.term,
+                type=concept.type,
+                dataType=concept.data_type,
+                category=concept.category or "",
+                explanation=concept.explanation or "",
+                confidence=concept.confidence,
+                boundingBox=concept.source_location.get("boundingBox") if concept.source_location else None,
+                ui_group=concept.ui_group or "General"
+            ),
+            log=f"Extracted concept: {concept.term}"
+        )
+    )
+    
+    await manager.broadcast_to_document(packet.model_dump(), document_id)
 
 
 async def send_relationship_update(document_id: uuid.UUID, relationship: Relationship):
