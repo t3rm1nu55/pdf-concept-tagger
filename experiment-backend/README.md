@@ -84,6 +84,15 @@ Real-time updates (basic echo for now).
 4. **Switch models**: Use `/api/v1/models/switch`
 5. **Compare results**: Check `/api/v1/concepts`
 
+## Development Guidelines
+
+**Follow [PROJECT_RULES.md](../PROJECT_RULES.md) for:**
+- Incremental & modular development
+- Critical mocking guidelines
+- Code quality standards
+- Testing strategies
+- Documentation requirements
+
 ## Next Steps
 
 - Add real databases (PostgreSQL, Neo4j, Pinecone)

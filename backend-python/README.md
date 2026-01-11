@@ -30,6 +30,15 @@ See DEMO_ARCHITECTURE.md for full architecture details.
 
 Follow TASKS.md for detailed task breakdown.
 
+## Development Guidelines
+
+**Follow [PROJECT_RULES.md](../PROJECT_RULES.md) for:**
+- Incremental & modular development
+- Critical mocking guidelines (pytest-specific)
+- Requirements → Design → Tasks pipeline
+- State-based actions and transparency
+- Pragmatic decision-making
+
 ## Parallel Development
 
 This track runs parallel to `experiment-backend/`:

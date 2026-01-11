@@ -44,6 +44,7 @@ See [docs/demo-machine/DEMO_ARCHITECTURE.md](docs/demo-machine/DEMO_ARCHITECTURE
 ### Production (Main Branch)
 - **[REQUIREMENTS.md](REQUIREMENTS.md)** - Functional requirements
 - **[CONTEXT.md](CONTEXT.md)** - Project context
+- **[PROJECT_RULES.md](PROJECT_RULES.md)** - Development rules and standards ⭐
 
 ### Development (Develop Branch)
 - **[docs/development/PARALLEL_DEVELOPMENT.md](docs/development/PARALLEL_DEVELOPMENT.md)** - Development coordination
@@ -94,10 +95,13 @@ Both tracks run in parallel and share learnings.
 
 ## 🤝 Contributing
 
-1. Check [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md) for workflow
+**Before contributing, read [PROJECT_RULES.md](PROJECT_RULES.md) for development guidelines.**
+
+1. Check [docs/development/BRANCH_STRATEGY.md](docs/development/BRANCH_STRATEGY.md) for workflow
 2. Track 1: Use `track1-experiment` branch
 3. Track 2: Use `track2-demo-machine` branch
-4. See [PARALLEL_DEVELOPMENT.md](PARALLEL_DEVELOPMENT.md) for coordination
+4. See [docs/development/PARALLEL_DEVELOPMENT.md](docs/development/PARALLEL_DEVELOPMENT.md) for coordination
+5. Follow [PROJECT_RULES.md](PROJECT_RULES.md) for code quality standards
 
 ## 📝 License
 

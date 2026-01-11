@@ -1,13 +1,36 @@
 """
-Shared data models for both experiment and demo tracks
+Shared data models for both experiment and demo tracks.
+
+These models are used across both Track 1 (experimentation) and Track 2 (demo machine)
+to ensure consistency in data structures.
+
+See PROJECT_RULES.md for development guidelines.
 """
 
 from typing import Optional, List, Dict, Any, Literal
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-# Shared Concept Model
 class Concept(BaseModel):
+    """
+    Concept model representing extracted entities/concepts from documents.
+    
+    Used by HARVESTER agent to represent extracted concepts with confidence scores
+    and metadata.
+    
+    Attributes:
+        id: Unique identifier for the concept
+        term: The actual text/name of the concept
+        type: "concept" or "hypernode"
+        dataType: Type of entity (entity, date, location, etc.)
+        category: Classification category
+        explanation: Brief description of what this concept is
+        confidence: Confidence score 0.0-1.0
+        boundingBox: [ymin, xmin, ymax, xmax] if detectable in image
+        ui_group: Grouping category for UI display
+        extractedBy: Agent that extracted this concept
+        timestamp: ISO timestamp of extraction
+    """
     id: str
     term: str
     type: Literal["concept", "hypernode"]
@@ -20,8 +43,12 @@ class Concept(BaseModel):
     extractedBy: Optional[str] = None
     timestamp: Optional[str] = None
 
-# Shared Domain Model
 class Domain(BaseModel):
+    """
+    Domain model representing broad domain structures.
+    
+    Used by ARCHITECT agent to define domains (e.g., "Legal Framework", "Financial").
+    """
     id: str
     name: str
     description: str = ""
@@ -29,8 +56,13 @@ class Domain(BaseModel):
     definedBy: Optional[str] = None
     timestamp: Optional[str] = None
 
-# Shared Relationship Model
+
 class Relationship(BaseModel):
+    """
+    Relationship model representing connections between concepts or domains.
+    
+    Used by ARCHITECT agent to create semantic relationships.
+    """
     source: str
     target: str
     predicate: str
@@ -39,16 +71,35 @@ class Relationship(BaseModel):
     createdBy: Optional[str] = None
     timestamp: Optional[str] = None
 
-# Shared Taxonomy Model
+
 class Taxonomy(BaseModel):
+    """
+    Taxonomy model representing hierarchical relationships.
+    
+    Used by CURATOR agent to organize taxonomical hierarchies.
+    """
     parent: str
     child: str
     type: Literal["is_a", "part_of"] = "is_a"
     createdBy: Optional[str] = None
     timestamp: Optional[str] = None
 
-# Shared Agent Packet Model
+
 class AgentPacket(BaseModel):
+    """
+    Agent Packet protocol for inter-agent communication.
+    
+    Standard format for messages between agents in the multi-agent system.
+    Used for streaming updates, task coordination, and state management.
+    
+    Attributes:
+        sender: Agent that sent the packet
+        recipient: Target agent (or "ALL" for broadcast)
+        intent: Purpose of the packet (GRAPH_UPDATE, TASK_COMPLETE, etc.)
+        content: Payload data (varies by intent)
+        timestamp: ISO timestamp of packet creation
+        correlationId: Optional correlation ID for tracking related packets
+    """
     sender: Literal["SYSTEM", "HARVESTER", "ARCHITECT", "CURATOR", "CRITIC", "ORCHESTRATOR", "OBSERVER"]
     recipient: str = "ALL"
     intent: Literal["INFO", "TASK_START", "TASK_COMPLETE", "CRITIQUE", "GRAPH_UPDATE", "ROUND_START", "HYPOTHESIS", "TOOL_USE", "EXPLAIN"] = "GRAPH_UPDATE"
@@ -56,16 +107,24 @@ class AgentPacket(BaseModel):
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
     correlationId: Optional[str] = None
 
-# Shared Document Model
+
 class Document(BaseModel):
+    """
+    Document model representing uploaded PDF documents.
+    """
     id: str
     filename: str
     page_count: int = 0
     metadata: Dict[str, Any] = Field(default_factory=dict)
     created_at: Optional[str] = None
 
-# Shared Analysis Request
+
 class AnalyzeRequest(BaseModel):
+    """
+    Request model for PDF analysis endpoint.
+    
+    Used by POST /api/v1/analyze endpoint.
+    """
     image_base64: str
     page_number: int
     exclude_terms: List[str] = Field(default_factory=list)
@@ -73,8 +132,13 @@ class AnalyzeRequest(BaseModel):
     model_override: Optional[str] = None
     domain_hints: List[str] = Field(default_factory=list)
 
-# Shared Experiment Request
+
 class ExperimentRequest(BaseModel):
+    """
+    Request model for prompt experimentation endpoint.
+    
+    Used by POST /api/v1/prompts/experiment endpoint.
+    """
     prompt: str
     image_base64: Optional[str] = None
     model: Optional[str] = None
