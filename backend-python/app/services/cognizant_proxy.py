@@ -32,20 +32,19 @@ class CognizantProxyLLM:
     """
     
     def __init__(self):
-        self.proxy_endpoint = os.getenv("COGNIZANT_PROXY_ENDPOINT")
-        self.proxy_api_key = os.getenv("COGNIZANT_PROXY_API_KEY")
+        """Initialize the gateway LLM service."""
+        # Gateway URL - defaults to localhost:8080 if not set
+        self.gateway_url = os.getenv("COGNIZANT_LLM_GATEWAY_URL", "http://localhost:8080")
+        # API key is optional for now (gateway may not require auth in dev)
+        self.api_key = os.getenv("COGNIZANT_LLM_GATEWAY_API_KEY", "")
         self.provider = os.getenv("LLM_PROVIDER", "openai")
         self.model = os.getenv("LLM_MODEL", "gpt-4-turbo-preview")
-        self.timeout = float(os.getenv("COGNIZANT_PROXY_TIMEOUT", "60.0"))
+        self.timeout = float(os.getenv("COGNIZANT_GATEWAY_TIMEOUT", "60.0"))
         
-            if not self.proxy_endpoint:
-                logger.error("COGNIZANT_PROXY_ENDPOINT not set in environment")
-                raise ValueError("COGNIZANT_PROXY_ENDPOINT not set in environment")
-            if not self.proxy_api_key:
-                logger.error("COGNIZANT_PROXY_API_KEY not set in environment")
-                raise ValueError("COGNIZANT_PROXY_API_KEY not set in environment")
-            
-            logger.info(f"Initialized CognizantProxyLLM: {self.provider}/{self.model}")
+        # Remove trailing slash
+        self.gateway_url = self.gateway_url.rstrip("/")
+        
+        logger.info(f"Initialized CognizantProxyLLM: gateway={self.gateway_url}, model={self.model}")
     
     async def chat_completion(
         self,
@@ -72,32 +71,40 @@ class CognizantProxyLLM:
             httpx.HTTPError: If proxy request fails
             ValueError: If response format is invalid
         """
+        logger.debug(f"Calling gateway: {self.model}, messages={len(messages)}")
         async with httpx.AsyncClient(timeout=self.timeout) as client:
+            # Gateway uses OpenAI-compatible format
             payload = {
-                "provider": self.provider,
                 "model": self.model,
                 "messages": messages,
                 "temperature": temperature,
                 **kwargs
             }
-            
             if max_tokens:
                 payload["max_tokens"] = max_tokens
-            
             if stream:
                 payload["stream"] = True
             
-            headers = {
-                "Authorization": f"Bearer {self.proxy_api_key}",
-                "Content-Type": "application/json"
-            }
+            # Build headers - API key is optional for gateway
+            headers = {"Content-Type": "application/json"}
+            if self.api_key:
+                headers["Authorization"] = f"Bearer {self.api_key}"
             
-            response = await client.post(
-                f"{self.proxy_endpoint}/chat/completions",
-                headers=headers,
-                json=payload
-            )
-            response.raise_for_status()
+            try:
+                # Gateway provides OpenAI-compatible endpoint
+                response = await client.post(
+                    f"{self.gateway_url}/v1/chat/completions",
+                    headers=headers,
+                    json=payload
+                )
+                response.raise_for_status()
+                logger.debug(f"Gateway response: {response.status_code}")
+            except httpx.HTTPError as e:
+                logger.error(f"Gateway HTTP error: {e}")
+                raise
+            except Exception as e:
+                logger.error(f"Gateway error: {e}")
+                raise
             
             if stream:
                 async for chunk in self._handle_stream_response(response):

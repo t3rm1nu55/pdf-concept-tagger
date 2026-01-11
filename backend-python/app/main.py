@@ -43,10 +43,13 @@ app.include_router(api_v1_router, prefix="/api/v1")
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
+    gateway_url = os.getenv("COGNIZANT_LLM_GATEWAY_URL", "http://localhost:8080")
+    logger.debug(f"Health check: gateway_url={gateway_url}")
     return {
         "status": "healthy",
         "version": "0.1.0-mvp",
-        "proxy_configured": bool(os.getenv("COGNIZANT_PROXY_ENDPOINT"))
+        "gateway_url": gateway_url,
+        "gateway_configured": bool(gateway_url)
     }
 
 
