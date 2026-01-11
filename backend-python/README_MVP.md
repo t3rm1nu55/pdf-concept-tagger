@@ -18,10 +18,15 @@ cp .env.example .env
 
 **Required in `.env`**:
 ```bash
-COGNIZANT_PROXY_ENDPOINT=https://your-cognizant-proxy.com/api/v1/llm
-COGNIZANT_PROXY_API_KEY=your_api_key_here
+# Cognizant LLM Gateway URL (defaults to localhost:8080)
+COGNIZANT_LLM_GATEWAY_URL=http://localhost:8080
+COGNIZANT_LLM_GATEWAY_API_KEY=  # Optional
+
+# LLM Provider and Model
 LLM_PROVIDER=openai
 LLM_MODEL=gpt-4-turbo-preview
+
+# PostgreSQL Database
 POSTGRES_URL=postgresql://pdf_tagger:pdf_tagger_dev@localhost:5432/pdf_tagger_mvp
 ```
 

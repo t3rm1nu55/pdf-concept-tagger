@@ -1,8 +1,8 @@
 """
-Cognizant Proxy LLM Service
+Cognizant LLM Gateway Service
 
-Handles all LLM calls through the Cognizant proxy.
-This ensures secure API key management and centralized rate limiting.
+Handles all LLM calls through the Cognizant LLM Gateway.
+The gateway provides OpenAI-compatible endpoints with intelligent routing.
 
 See PROJECT_RULES.md for development guidelines.
 """
