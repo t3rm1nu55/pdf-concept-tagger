@@ -46,7 +46,7 @@ def upgrade() -> None:
         sa.Column('source_location', postgresql.JSON),
         sa.Column('ui_group', sa.String(100)),
         sa.Column('extracted_by', sa.String(100)),
-        sa.Column('metadata', postgresql.JSON),
+        sa.Column('concept_metadata', postgresql.JSON),  # Renamed from 'metadata' (reserved in SQLAlchemy)
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now()),
         sa.Column('updated_at', sa.DateTime(timezone=True), onupdate=sa.func.now())
     )
@@ -61,7 +61,7 @@ def upgrade() -> None:
         sa.Column('predicate', sa.String(200)),
         sa.Column('confidence', sa.Float),
         sa.Column('strength', sa.Float),
-        sa.Column('metadata', postgresql.JSON),
+        sa.Column('relationship_metadata', postgresql.JSON),  # Renamed from 'metadata' (reserved in SQLAlchemy)
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now())
     )
     
