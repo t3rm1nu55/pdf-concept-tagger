@@ -1,0 +1,5 @@
+{
+  "name": "PDF Concept Tagger",
+  "description": "An intelligent tool for regulatory analysts to upload PDFs, perform OCR, and visually tag key concepts using AI. Streamline your document analysis and quickly identify regulations, obligations, risks, and more.",
+  "requestFramePermissions": []
+}
