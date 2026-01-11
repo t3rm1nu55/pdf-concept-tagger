@@ -285,6 +285,7 @@ async def analyze_pdf(
                     return
                 
                 # 5. Process text extraction
+                stored_concepts = []
                 async for packet in process_text_extraction(
                     page_text,
                     document_id,
