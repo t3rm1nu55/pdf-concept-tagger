@@ -5,7 +5,7 @@ MVP: Extract text from PDF pages using pdfplumber.
 """
 
 import pdfplumber
-from typing import Optional
+from typing import Optional, List
 from pathlib import Path
 
 
