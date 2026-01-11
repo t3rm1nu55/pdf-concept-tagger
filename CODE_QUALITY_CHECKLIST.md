@@ -1,7 +1,8 @@
 # Code Quality Checklist
 
 > **Based on**: [PROJECT_RULES.md](PROJECT_RULES.md)  
-> **Use**: Before every commit, before PR, completing a task
+> **Use**: Before every commit, before PR, completing a task  
+> **Note**: Cursor 2.0 has built-in code review - use this checklist to supplement, not replace, Cursor's review features
 
 ## Pre-Commit Checklist
 

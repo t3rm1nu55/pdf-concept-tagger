@@ -561,7 +561,9 @@ mypy app/                 # Type check
 black .                   # Format code
 
 # Search
-codebase_search "query"   # Semantic search (always first)
+# Note: Cursor 2.0 Composer model has optimized semantic search built-in
+# Use codebase_search tool (semantic) → grep (exact) → read_file workflow
+codebase_search "query"   # Semantic search (always first) - Cursor optimized
 grep "pattern" app/       # Exact pattern search
 rg "pattern" app/         # Fast search (if ripgrep installed)
 
@@ -569,6 +571,19 @@ rg "pattern" app/         # Fast search (if ripgrep installed)
 git commit -m "feat: description [YYYY-MM-DD HH:MM]"
 git diff --cached         # Review staged changes
 ```
+
+### Cursor 2.0 Integration
+
+**Built-in Features** (don't duplicate):
+- ✅ **Semantic Search**: Composer model has optimized codebase-wide semantic search
+- ✅ **Code Review**: Enhanced review interface for multi-file changes
+- ✅ **Multi-Agent**: Can run up to 8 agents in parallel
+- ✅ **Sandboxed Terminals**: Secure command execution
+
+**This Project Adds**:
+- ✅ Pre-commit hooks (automated quality checks)
+- ✅ Project-specific rules (`.cursorrules`)
+- ✅ Quality checklist (supplements Cursor's review)
 
 ### Key Files
 

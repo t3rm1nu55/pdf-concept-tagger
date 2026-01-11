@@ -1,0 +1,46 @@
+# Cursor IDE Rules for PDF Concept Tagger
+
+> **Note**: Cursor 2.0 has built-in semantic search (Composer model) - this file supplements, not replaces, those optimizations.
+
+## Project Rules Reference
+
+**Primary Rules Document**: [PROJECT_RULES.md](PROJECT_RULES.md)
+
+**Key Principles**:
+- Incremental & modular development
+- Never mock in production code
+- Requirements → Design → Tasks pipeline
+- State-based actions (not time-based)
+- Transparency in decisions
+
+## Code Quality Standards
+
+**Pre-Commit Checklist**: See [CODE_QUALITY_CHECKLIST.md](CODE_QUALITY_CHECKLIST.md)
+
+**Quick Reference**:
+- Always `codebase_search` first (semantic) → `grep` (exact) → `read_file`
+- No duplication - search codebase before creating
+- Document complex logic with docstrings
+- Error handling for async operations
+
+## Development Workflow
+
+1. Review REQUIREMENTS.md → `codebase_search` → `grep` → Create todos
+2. Implement incrementally → Test → Document → Review → Commit
+3. Follow PROJECT_RULES.md for all development decisions
+
+## Testing Guidelines
+
+- Mocks only in `tests/` or `__mocks__/` directories
+- Use `mock*` prefix for mock data
+- Integration tests use real services when possible
+- E2E tests always use real services
+
+## Architecture
+
+- **Backend**: FastAPI + LangChain/LangGraph
+- **Agents**: HARVESTER → ARCHITECT → CURATOR → CRITIC → OBSERVER
+- **Databases**: PostgreSQL, Neo4j, Pinecone, Elasticsearch, Redis
+- **Frontend**: React + Vite (Track 2) / Angular (legacy)
+
+See [docs/demo-machine/DEMO_ARCHITECTURE.md](docs/demo-machine/DEMO_ARCHITECTURE.md) for details.
