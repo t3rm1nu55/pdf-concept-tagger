@@ -1,33 +1,83 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
+# Dependencies
+node_modules/
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 
 # Environment variables
 .env
 .env.local
 .env.*.local
+*.env
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
 # Build outputs
-.angular
-*.tsbuildinfo
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+
+# Type checking
+.mypy_cache/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Backend specific
+backend-python/__pycache__/
+experiment-backend/__pycache__/
+*.pyc
+
+# Frontend specific
+.next/
+out/
+.cache/
+
+# Docker
+.dockerignore
+
+# Archives
+*.zip
+*.tar.gz
+
+# Local development
+.local/
+local/
